@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SGRR.Data/SGRR.Data.csproj" />
+  <Project Path="SGRR.Test/SGRR.Test.csproj" />
+  <Project Path="SGRR.Web/SGRR.Web.csproj" />
+</Solution>
