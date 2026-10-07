@@ -74,6 +74,13 @@ public class AuthService : IAuthService
     public User? Login(string email, string password)
     {
         var user = _authRepository.Login(email, password);
-        return user is { IsActive: true } ? user : null;
+        
+        if (user != null && !user.IsActive)
+        {
+            // Lanzamos una excepcion clara que podemos capturar en el Controlador y en el Test.
+            throw new UnauthorizedAccessException("Su cuenta ha sido bloqueada. Contacte al administrador.");
+        }
+
+        return user;
     }
 }
