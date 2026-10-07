@@ -57,6 +57,8 @@ using (var scope = app.Services.CreateScope())
     
     // Llamamos al inicializador que acabamos de crear en la capa Data
     SGRR.Data.Context.DbInitializer.Initialize(context);
+    var notificationRepository = services.GetRequiredService<INotificacionRepository>();
+    DbInitializer.InitializeNotifications(context, notificationRepository);
 }
 
 app.Run();
