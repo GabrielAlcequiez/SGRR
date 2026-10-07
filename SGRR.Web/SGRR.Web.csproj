@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SGRR.Data\SGRR.Data.csproj" />
+  </ItemGroup>
+
 </Project>

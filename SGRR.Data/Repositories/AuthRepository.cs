@@ -21,14 +21,7 @@ public class AuthRepository : IAuthRepository
             throw new ArgumentException("Nombre, correo y contraseña son obligatorios.");
         }
 
-        string normalizedEmail = email.Trim().ToLower();
-
-        // Validar duplicado
-        bool emailExists = _context.Users.Any(u => u.Email.ToLower() == normalizedEmail);
-        if (emailExists)
-        {
-            throw new InvalidOperationException($"El correo '{email}' ya se encuentra registrado.");
-        }
+        string normalizedEmail = email.Trim().ToLowerInvariant();
 
         var newUser = new User(
             name: name.Trim(),
@@ -51,7 +44,7 @@ public class AuthRepository : IAuthRepository
             return null;
         }
 
-        string normalizedEmail = email.Trim().ToLower();
+        string normalizedEmail = email.Trim().ToLowerInvariant();
 
         // Buscar coincidencia de email y contraseña directa (no habra hash x ahora como es un proyecto para simular devops)
         var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == normalizedEmail && u.Password == password);

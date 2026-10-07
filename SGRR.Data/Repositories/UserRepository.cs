@@ -65,6 +65,7 @@ public class UserRepository : IUserRepository
             return false;
         }
         
-        return _context.Users.Any(x => x.Email.ToLower() == email.ToLower());
+        string normalizedEmail = email.Trim().ToLowerInvariant();
+        return _context.Users.Any(x => x.Email.ToLower() == normalizedEmail);
     }
 }
