@@ -45,5 +45,14 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+// === INYECTAR DATOS DE PRUEBA ===
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<SGRR.Data.Context.AppDbContext>();
+    
+    // Llamamos al inicializador que acabamos de crear en la capa Data
+    SGRR.Data.Context.DbInitializer.Initialize(context);
+}
 
 app.Run();
