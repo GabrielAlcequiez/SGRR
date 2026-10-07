@@ -89,15 +89,24 @@ public class AuthController : Controller
             return View(dto);
         }
 
-        var user = _authService.Login(dto.Email, dto.Password);
-        if (user is null || (user.Role != Roles.Client && user.Role != Roles.Propietary))
+        try
         {
-            ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
+            var user = _authService.Login(dto.Email, dto.Password);
+            
+            if (user is null)
+            {
+                ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
+                return View(dto);
+            }
+
+            StartSession(user.Id, user.Name, user.Role);
+            return RedirectToRoleHome(user.Role);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
             return View(dto);
         }
-
-        StartSession(user.Id, user.Name, user.Role);
-        return RedirectToRoleHome(user.Role);
     }
 
     [HttpPost]
@@ -115,16 +124,16 @@ public class AuthController : Controller
         HttpContext.Session.SetString(UserRoleSessionKey, role.ToString());
     }
 
-    private IActionResult RedirectToRoleHome(Roles role)
+private IActionResult RedirectToRoleHome(Roles role)
     {
         return role switch
         {
             Roles.Client => RedirectToAction("Index", "Client"),
             Roles.Propietary => RedirectToAction("Dashboard", "Proprietary"),
+            Roles.Administrator => RedirectToAction("Dashboard", "Admin"), // Agregamos la ruta del Admin
             _ => RedirectToAction(nameof(Login))
         };
     }
-
     // simple helper para validar que el rol sea el correcto y que rechaze cualquier otra cosa.
     private static bool TryGetAllowedRole(string value, out Roles role)
     {
