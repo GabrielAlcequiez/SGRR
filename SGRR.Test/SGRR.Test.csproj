@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SGRR.Data\SGRR.Data.csproj" />
+    <ProjectReference Include="..\SGRR.Web\SGRR.Web.csproj" />
+  </ItemGroup>
+
 </Project>
