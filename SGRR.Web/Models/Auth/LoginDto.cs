@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SGRR.Web.Models.Auth;
 
-public class LoginClientDto
+public class LoginDto
 {
     [Required(ErrorMessage = "El correo es obligatorio.")]
     [EmailAddress(ErrorMessage = "Ingresa un correo válido.")]

@@ -1,11 +1,11 @@
 @model SGRR.Web.Models.Auth.RegisterClientDto
 @{
-    ViewData["Title"] = "Registro de cliente";
+    ViewData["Title"] = "Registro";
 }
 
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-        <h1 class="h3 mb-3">Crear cuenta de cliente</h1>
+        <h1 class="h3 mb-3">Crear cuenta</h1>
         <form asp-action="Register" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <div class="mb-3">
@@ -25,6 +25,28 @@
                     <option value="Propietary">Propietario</option>
                 </select>
                 <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+            <div id="restaurant-fields" hidden="@(Model.Role != "Propietary" ? "hidden" : null)">
+                <h2 class="h5 mt-4">Datos del restaurante</h2>
+                <div class="mb-3">
+                    <label asp-for="RestaurantName" class="form-label"></label>
+                    <input asp-for="RestaurantName" class="form-control" />
+                    <span asp-validation-for="RestaurantName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Specialty" class="form-label"></label>
+                    <input asp-for="Specialty" class="form-control" />
+                    <span asp-validation-for="Specialty" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Location" class="form-label"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                </div>
             </div>
             <div class="mb-3">
                 <label asp-for="Email" class="form-label"></label>
@@ -49,4 +71,19 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        const roleSelector = document.getElementById("Role");
+        const restaurantFields = document.getElementById("restaurant-fields");
+        const requiredRestaurantInputs = ["RestaurantName", "Specialty", "Location"]
+            .map(id => document.getElementById(id));
+
+        function updateRestaurantFields() {
+            const isProprietary = roleSelector.value === "Propietary";
+            restaurantFields.hidden = !isProprietary;
+            requiredRestaurantInputs.forEach(input => input.required = isProprietary);
+        }
+
+        roleSelector.addEventListener("change", updateRestaurantFields);
+        updateRestaurantFields();
+    </script>
 }

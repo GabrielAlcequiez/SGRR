@@ -10,6 +10,14 @@ namespace SGRR.Data.Context
         {
             optionsBuilder.UseInMemoryDatabase("AppDbContext");
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasOne(user => user.Restaurant)
+                .WithOne()
+                .HasForeignKey<User>("RestaurantId");
+        }
         
         #region DbSets
 

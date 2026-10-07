@@ -14,7 +14,7 @@ public class AuthRepository : IAuthRepository
         _context = context;
     }
 
-    public User? Register(string name, string lastName, string email, string password, Roles role)
+    public User? Register(string name, string lastName, string email, string password, Roles role, Restaurant? restaurant = null)
     {
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
@@ -30,6 +30,11 @@ public class AuthRepository : IAuthRepository
             password: password,
             role: role
         );
+
+        if (restaurant is not null)
+        {
+            newUser.SetRestaurant(restaurant);
+        }
 
         _context.Users.Add(newUser);
         _context.SaveChanges();
