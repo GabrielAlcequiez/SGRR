@@ -1,0 +1,38 @@
+@model IEnumerable<SGRR.Data.Entities.Restaurant>
+
+@{
+    ViewData["Title"] = "Restaurantes";
+}
+
+<h1>Restaurantes</h1>
+
+<p>
+    <a asp-action="Create">Agregar restaurante</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Especialidad</th>
+            <th>Ubicación</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var restaurant in Model)
+        {
+            <tr>
+                <td>@restaurant.Name</td>
+                <td>@restaurant.Specialty</td>
+                <td>@restaurant.Location</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@restaurant.Id">Editar</a>
+                    <form asp-action="Delete" asp-route-id="@restaurant.Id" method="post" style="display:inline">
+                        <button type="submit" onclick="return confirm('¿Eliminar este restaurante?');">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

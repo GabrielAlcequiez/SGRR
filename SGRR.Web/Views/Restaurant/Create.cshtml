@@ -1,0 +1,36 @@
+@model SGRR.Web.Models.Restaurant.CreateRestaurantDto
+
+@{
+    ViewData["Title"] = "Nuevo Restaurante";
+}
+
+<h1>Nuevo Restaurante</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+
+    <div>
+        <label asp-for="Name"></label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+
+    <div>
+        <label asp-for="Specialty"></label>
+        <input asp-for="Specialty" />
+        <span asp-validation-for="Specialty"></span>
+    </div>
+
+    <div>
+        <label asp-for="Location"></label>
+        <input asp-for="Location" />
+        <span asp-validation-for="Location"></span>
+    </div>
+
+    <div>
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description"></textarea>
+    </div>
+
+    <button type="submit">Guardar</button>
+</form>
