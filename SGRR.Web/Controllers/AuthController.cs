@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using SGRR.Data.Common.Enums;
 using SGRR.Web.Interfaces;
 using SGRR.Web.Models.Auth;
@@ -58,9 +57,9 @@ public class AuthController : Controller
                     dto.LastName,
                     dto.Email,
                     dto.Password,
-                    dto.RestaurantName,
-                    dto.Specialty,
-                    dto.Location,
+                    dto.RestaurantName!,
+                    dto.Specialty!,
+                    dto.Location!,
                     dto.Description)
                 : _authService.Register(dto.Name, dto.LastName, dto.Email, dto.Password, Roles.Client);
             StartSession(user.Id, user.Name, user.Role);

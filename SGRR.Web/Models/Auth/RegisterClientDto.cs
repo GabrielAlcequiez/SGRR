@@ -13,13 +13,13 @@ public class RegisterClientDto
     public string LastName { get; set; } = string.Empty;
 
     [Display(Name = "Nombre del restaurante")]
-    public string RestaurantName { get; set; } = string.Empty;
+    public string? RestaurantName { get; set; }
 
     [Display(Name = "Especialidad")]
-    public string Specialty { get; set; } = string.Empty;
+    public string? Specialty { get; set; }
 
     [Display(Name = "Ubicación")]
-    public string Location { get; set; } = string.Empty;
+    public string? Location { get; set; }
 
     [Display(Name = "Descripción")]
     public string? Description { get; set; }

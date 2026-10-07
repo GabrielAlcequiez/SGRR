@@ -42,9 +42,11 @@ public class AuthService : IAuthService
         string location,
         string? description)
     {
-        if (string.IsNullOrWhiteSpace(restaurantName) || string.IsNullOrWhiteSpace(location))
+        if (string.IsNullOrWhiteSpace(restaurantName) ||
+            string.IsNullOrWhiteSpace(specialty) ||
+            string.IsNullOrWhiteSpace(location))
         {
-            throw new ArgumentException("El nombre y la ubicación del local son obligatorios.");
+            throw new ArgumentException("El nombre, la especialidad y la ubicación del local son obligatorios.");
         }
 
         if (_userRepository.ExistsByEmail(email))
