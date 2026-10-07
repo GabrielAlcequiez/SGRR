@@ -5,6 +5,6 @@ namespace SGRR.Data.Interfaces;
 
 public interface IAuthRepository
 {
-    User? Register(string name, string lastName, string email, string password, Roles role);
+    User? Register(string name, string lastName, string email, string password, Roles role, Restaurant? restaurant = null);
     User? Login(string email, string password);
 }

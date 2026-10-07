@@ -9,10 +9,17 @@ public class User
     public string LastName { get; private set; } 
     public string Email { get; private set; } 
     public string Password { get; private set; }
-    
     public Roles Role  { get; private set; }
-    
-    public User(string name, string lastName, string email, string password, Roles role)
+    public bool IsActive { get; private set; } = true;
+    public Restaurant? Restaurant { get; private set; }
+
+    public User(
+        string name,
+        string lastName,
+        string email,
+        string password,
+        Roles role,
+        Restaurant? restaurant = null)
     {
         // Validations
         if (string.IsNullOrWhiteSpace(name))
@@ -29,5 +36,12 @@ public class User
         Email = email.Trim().ToLowerInvariant();
         Password = password;
         Role = role;
+        Restaurant = restaurant;
+    }
+
+    // Añadido para manejar el bloqueo de cuentas.
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
     }
 }

@@ -14,7 +14,7 @@ public class AuthRepository : IAuthRepository
         _context = context;
     }
 
-    public User? Register(string name, string lastName, string email, string password, Roles role)
+    public User? Register(string name, string lastName, string email, string password, Roles role, Restaurant? restaurant = null)
     {
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
@@ -28,7 +28,8 @@ public class AuthRepository : IAuthRepository
             lastName: lastName?.Trim() ?? string.Empty,
             email: normalizedEmail,
             password: password,
-            role: role
+            role: role,
+            restaurant: restaurant
         );
 
         _context.Users.Add(newUser);

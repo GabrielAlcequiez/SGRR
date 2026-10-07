@@ -6,6 +6,7 @@ namespace SGRR.Data.Interfaces
     {
         Task<IEnumerable<Restaurant>> GetAllAsync();
         Task<Restaurant?> GetByIdAsync(Guid id);
+        Task<bool> ExistsByNameAndLocationAsync(string name, string location);
         Task AddAsync(Restaurant restaurant);
         Task UpdateAsync(Restaurant restaurant);
         Task DeleteAsync(Guid id);
