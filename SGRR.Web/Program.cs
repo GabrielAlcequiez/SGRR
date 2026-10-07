@@ -22,6 +22,7 @@ builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddSingleton<ICategoryRepository, InMemoryCategoryRepository>();
+builder.Services.AddSingleton<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
