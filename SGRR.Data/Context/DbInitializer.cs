@@ -1,5 +1,6 @@
 using SGRR.Data.Common.Enums;
 using SGRR.Data.Entities;
+using SGRR.Data.Interfaces;
 
 namespace SGRR.Data.Context;
 
@@ -58,5 +59,39 @@ public static class DbInitializer
         context.Users.AddRange(admin, client, proprietary);
         context.Restaurants.Add(restaurant);
         context.SaveChanges();
+    }
+
+    public static void InitializeNotifications(
+        AppDbContext context,
+        INotificacionRepository notificationRepository)
+    {
+        var client = context.Users.FirstOrDefault(user =>
+            user.Email == "cliente@foodbook.com" && user.Role == Roles.Client);
+
+        if (client is null || notificationRepository.GetByClientId(client.Id).Any())
+            return;
+
+        var reservation = new ClientNotification(
+            client.Id,
+            NotificationType.Reservation,
+            "Reserva confirmada",
+            "Tu reserva está confirmada para mañana a las 7:00 p. m.");
+
+        var order = new ClientNotification(
+            client.Id,
+            NotificationType.Order,
+            "Pedido listo",
+            "Tu pedido está listo para recoger.");
+        order.MarkAsRead();
+
+        var reminder = new ClientNotification(
+            client.Id,
+            NotificationType.VisitReminder,
+            "Recordatorio de visita",
+            "Recuerda tu visita al restaurante mañana.");
+
+        notificationRepository.Add(reservation);
+        notificationRepository.Add(order);
+        notificationRepository.Add(reminder);
     }
 }

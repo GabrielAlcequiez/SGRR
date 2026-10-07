@@ -1,0 +1,49 @@
+@using SGRR.Data.Common.Enums
+@model IEnumerable<SGRR.Web.Models.Notifications.NotificacionResponseDto>
+@{
+    ViewData["Title"] = "Mis notificaciones";
+}
+
+<div class="mt-4">
+    <h1 class="h2 mb-4">Mis notificaciones</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info" role="status">No tienes notificaciones.</div>
+    }
+    else
+    {
+        <ul class="list-unstyled">
+            @foreach (var notification in Model)
+            {
+                var typeLabel = notification.Type switch
+                {
+                    NotificationType.Reservation => "Reserva",
+                    NotificationType.Order => "Pedido",
+                    NotificationType.VisitReminder => "Recordatorio de visita",
+                    _ => "Notificación"
+                };
+
+                <li class="mb-3">
+                    <article class="card @(notification.IsRead ? "" : "border-primary border-2")">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                                <h2 class="h5 mb-0 text-break @(notification.IsRead ? "" : "fw-bold")">@notification.Title</h2>
+                                <span class="badge @(notification.IsRead ? "bg-secondary" : "bg-primary")">
+                                    @(notification.IsRead ? "Leída" : "No leída")
+                                </span>
+                            </div>
+                            <p class="card-text text-break">@notification.Message</p>
+                            <div class="d-flex flex-wrap justify-content-between gap-2 small text-muted">
+                                <span>Tipo: @typeLabel</span>
+                                <time datetime="@notification.CreatedAt.ToString("O")">
+                                    @notification.CreatedAt.ToString("dd/MM/yyyy HH:mm") UTC
+                                </time>
+                            </div>
+                        </div>
+                    </article>
+                </li>
+            }
+        </ul>
+    }
+</div>
