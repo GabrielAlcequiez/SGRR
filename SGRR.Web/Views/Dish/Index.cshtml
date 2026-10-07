@@ -1,0 +1,39 @@
+@model IEnumerable<SGRR.Data.Entities.Dish>
+
+@{
+    ViewData["Title"] = "Menú";
+    var restaurantId = ViewBag.RestaurantId;
+}
+
+<h1>Menú</h1>
+
+<p>
+    <a asp-action="Create" asp-route-restaurantId="@restaurantId">Agregar plato</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Descripción</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dish in Model)
+        {
+            <tr>
+                <td>@dish.Name</td>
+                <td>@dish.Price.ToString("C")</td>
+                <td>@dish.Description</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@dish.Id">Editar</a>
+                    <form asp-action="Delete" asp-route-id="@dish.Id" asp-route-restaurantId="@restaurantId" method="post" style="display:inline">
+                        <button type="submit" onclick="return confirm('¿Eliminar este plato?');">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
