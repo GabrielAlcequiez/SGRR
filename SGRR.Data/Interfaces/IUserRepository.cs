@@ -7,5 +7,6 @@ public interface IUserRepository
     void Add(User user);
     void Update(User user);
     IEnumerable<User> GetAll();
-    User GetById(Guid id);
+    User? GetById(Guid id);
+    bool ExistsByEmail(string email);
 }
