@@ -18,8 +18,7 @@ public class User
         string lastName,
         string email,
         string password,
-        Roles role,
-        Restaurant? restaurant = null)
+        Roles role)
     {
         // Validations
         if (string.IsNullOrWhiteSpace(name))
@@ -36,6 +35,11 @@ public class User
         Email = email.Trim().ToLowerInvariant();
         Password = password;
         Role = role;
+    }
+
+    public void SetRestaurant(Restaurant restaurant)
+    {
+        ArgumentNullException.ThrowIfNull(restaurant);
         Restaurant = restaurant;
     }
 

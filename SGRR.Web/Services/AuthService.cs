@@ -71,6 +71,7 @@ public class AuthService : IAuthService
 
     public User? Login(string email, string password)
     {
-        return _authRepository.Login(email, password);
+        var user = _authRepository.Login(email, password);
+        return user is { IsActive: true } ? user : null;
     }
 }

@@ -33,6 +33,12 @@
                             <li class="nav-item">
                                 <span class="nav-link">Hola, @Context.Session.GetString("UserName")</span>
                             </li>
+                            @if (Context.Session.GetString("UserRole") == "Propietary")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Proprietary" asp-action="Dashboard">Dashboard</a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <form asp-controller="Auth" asp-action="Logout" method="post">
                                     <button type="submit" class="nav-link btn btn-link">Cerrar sesión</button>

@@ -28,9 +28,13 @@ public class AuthRepository : IAuthRepository
             lastName: lastName?.Trim() ?? string.Empty,
             email: normalizedEmail,
             password: password,
-            role: role,
-            restaurant: restaurant
+            role: role
         );
+
+        if (restaurant is not null)
+        {
+            newUser.SetRestaurant(restaurant);
+        }
 
         _context.Users.Add(newUser);
         _context.SaveChanges();
