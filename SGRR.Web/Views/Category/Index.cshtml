@@ -1,0 +1,73 @@
+@model IEnumerable<SGRR.Data.Entities.Category>
+@{
+    ViewData["Title"] = "Gestión de Categorías";
+}
+
+<div class="container mt-4">
+    <h2>Administración de Categorías</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card mt-4 mb-4">
+        <div class="card-body">
+            <form asp-controller="Category" asp-action="Create" method="post" class="d-flex gap-2 align-items-center">
+                <label for="name" class="fw-bold mb-0">Nueva Categoría:</label>
+                <input type="text" id="name" name="name" class="form-control w-auto" placeholder="Ej. Comida Italiana" required />
+                <button type="submit" class="btn btn-primary">Crear</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre de la Categoría</th>
+                        <th style="width: 150px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="2" class="text-center">No hay categorías registradas.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var category in Model)
+                        {
+                            <tr>
+                                <td>@category.Name</td>
+                                <td>
+                                    <form asp-controller="Category" asp-action="Delete" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@category.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('¿Estás seguro de que deseas eliminar esta categoría?');">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

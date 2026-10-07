@@ -22,7 +22,7 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Register(RegisterClientDto dto)
+    public async Task<IActionResult> Register(RegisterClientDto dto)
     {
         if (!ModelState.IsValid)
         {
@@ -35,15 +35,39 @@ public class AuthController : Controller
             return View(dto);
         }
 
+        if (role == Roles.Propietary &&
+            (string.IsNullOrWhiteSpace(dto.RestaurantName) ||
+             string.IsNullOrWhiteSpace(dto.Specialty) ||
+             string.IsNullOrWhiteSpace(dto.Location)))
+        {
+            if (string.IsNullOrWhiteSpace(dto.RestaurantName))
+                ModelState.AddModelError(nameof(dto.RestaurantName), "El nombre del restaurante es obligatorio.");
+            if (string.IsNullOrWhiteSpace(dto.Specialty))
+                ModelState.AddModelError(nameof(dto.Specialty), "La especialidad es obligatoria.");
+            if (string.IsNullOrWhiteSpace(dto.Location))
+                ModelState.AddModelError(nameof(dto.Location), "La ubicación es obligatoria.");
+            return View(dto);
+        }
+
         try
         {
-            var user = _authService.Register(dto.Name, dto.LastName, dto.Email, dto.Password, role);
+            var user = role == Roles.Propietary
+                ? await _authService.RegisterProprietaryAsync(
+                    dto.Name,
+                    dto.LastName,
+                    dto.Email,
+                    dto.Password,
+                    dto.RestaurantName!,
+                    dto.Specialty!,
+                    dto.Location!,
+                    dto.Description)
+                : _authService.Register(dto.Name, dto.LastName, dto.Email, dto.Password, Roles.Client);
             StartSession(user.Id, user.Name, user.Role);
             return RedirectToRoleHome(user.Role);
         }
         catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError(nameof(dto.Email), ex.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
             return View(dto);
         }
         catch (ArgumentException ex)
@@ -54,26 +78,35 @@ public class AuthController : Controller
     }
 
     [HttpGet]
-    public IActionResult Login() => View(new LoginClientDto());
+    public IActionResult Login() => View(new LoginDto());
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Login(LoginClientDto dto)
+    public IActionResult Login(LoginDto dto)
     {
         if (!ModelState.IsValid)
         {
             return View(dto);
         }
 
-        var user = _authService.Login(dto.Email, dto.Password);
-        if (user is null)
+        try
         {
-            ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
+            var user = _authService.Login(dto.Email, dto.Password);
+            
+            if (user is null)
+            {
+                ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
+                return View(dto);
+            }
+
+            StartSession(user.Id, user.Name, user.Role);
+            return RedirectToRoleHome(user.Role);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
             return View(dto);
         }
-
-        StartSession(user.Id, user.Name, user.Role);
-        return RedirectToRoleHome(user.Role);
     }
 
     [HttpPost]
@@ -91,13 +124,16 @@ public class AuthController : Controller
         HttpContext.Session.SetString(UserRoleSessionKey, role.ToString());
     }
 
-    private IActionResult RedirectToRoleHome(Roles role)
+private IActionResult RedirectToRoleHome(Roles role)
     {
-        return role == Roles.Client
-            ? RedirectToAction("Index", "Client")
-            : RedirectToAction("Index", "Home");
+        return role switch
+        {
+            Roles.Client => RedirectToAction("Index", "Client"),
+            Roles.Propietary => RedirectToAction("Dashboard", "Proprietary"),
+            Roles.Administrator => RedirectToAction("Dashboard", "Admin"), // Agregamos la ruta del Admin
+            _ => RedirectToAction(nameof(Login))
+        };
     }
-
     // simple helper para validar que el rol sea el correcto y que rechaze cualquier otra cosa.
     private static bool TryGetAllowedRole(string value, out Roles role)
     {

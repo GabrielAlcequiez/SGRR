@@ -24,6 +24,16 @@ namespace SGRR.Data.Repositories
             return await _context.Restaurants.FindAsync(id);
         }
 
+        public Task<bool> ExistsByNameAndLocationAsync(string name, string location)
+        {
+            string normalizedName = name.Trim().ToLowerInvariant();
+            string normalizedLocation = location.Trim().ToLowerInvariant();
+
+            return _context.Restaurants.AnyAsync(restaurant =>
+                restaurant.Name.ToLower() == normalizedName &&
+                restaurant.Location.ToLower() == normalizedLocation);
+        }
+
         public async Task AddAsync(Restaurant restaurant)
         {
             await _context.Restaurants.AddAsync(restaurant);
