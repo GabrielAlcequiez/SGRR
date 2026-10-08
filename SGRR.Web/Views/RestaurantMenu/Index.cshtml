@@ -1,0 +1,116 @@
+﻿@model SGRR.Web.Models.RestaurantMenuViewModel
+
+@{
+    ViewData["Title"] = "Menú Interactivo y Disponibilidad";
+}
+
+<div class="container mt-4">
+    <!-- Cabecera del Restaurante -->
+    <div class="text-center mb-5 p-4 bg-light rounded shadow-sm border-start border-4 border-primary">
+        <h1 class="display-5 fw-bold text-dark">🍽️ @Model.RestaurantName</h1>
+        <p class="lead text-muted mb-0">Explora nuestra variedad gastronómica y consulta horarios de reserva en tiempo real</p>
+    </div>
+
+    <div class="row">
+        <!-- BARRA LATERAL: CONTROL DE FECHA Y HORARIOS -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 20px; z-index: 10;">
+                <div class="card-header bg-dark text-white fw-bold py-3">
+                    📅 Planifica tu Reservación
+                </div>
+                <div class="card-body bg-white">
+                    <!-- Formulario apuntando a tu controlador -->
+                    <form method="get" action="@Url.Action("Index", "RestaurantMenu")" id="dateForm">
+                        <input type="hidden" name="restaurantId" value="@Model.RestaurantId" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-secondary">1. Elegir Fecha de Asistencia:</label>
+                            <input type="date" name="date" class="form-control form-control-lg border-2"
+                                   value="@ViewBag.SelectedDate" onchange="document.getElementById('dateForm').submit();" />
+                        </div>
+                    </form>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary">2. Horarios de Atención Disponibles:</label>
+
+                        @* Manejo de errores cuando no existan horarios disponibles *@
+                        @if (!string.IsNullOrEmpty(Model.ScheduleErrorMessage))
+                        {
+                            <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
+                                <div>⚠️ @Model.ScheduleErrorMessage</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <select class="form-select form-select-lg border-2">
+                                <option value="">-- Seleccionar un bloque de tiempo --</option>
+                                @foreach (var hour in Model.AvailableHours)
+                                {
+                                    <option value="@hour">@hour Hs</option>
+                                }
+                            </select>
+                            <div class="form-text text-success mt-2">✓ El establecimiento se encuentra abierto en esta fecha.</div>
+                        }
+                    </div>
+
+                    <button class="btn btn-primary btn-lg w-100 mt-3 shadow" @(string.IsNullOrEmpty(Model.ScheduleErrorMessage) ? "" : "disabled")>
+                        Proceder con la Reserva
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
+                <h3 class="fw-bold text-secondary m-0">📖 Carta de Platillos Disponibles</h3>
+            </div>
+
+            @* Manejo de errores cuando el menú esté vacío *@
+            @if (!string.IsNullOrEmpty(Model.MenuErrorMessage))
+            {
+                <div class="alert alert-warning border-start border-4 border-warning shadow-sm" role="alert">
+                    <h4 class="alert-heading fw-bold">Menú en Mantenimiento</h4>
+                    <p class="mb-0">@Model.MenuErrorMessage</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var category in Model.CategorizedMenu)
+                {
+                    <!-- Título de la Categoría -->
+                    <div class="bg-gradient bg-secondary text-white p-2 px-3 rounded shadow-sm fw-bold my-4 fs-5 text-uppercase">
+                        📂 @category.Key
+                    </div>
+
+                    <!-- Cuadrícula de Platos -->
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        @foreach (var item in category.Value)
+                        {
+                            <div class="col">
+                                <div class="card h-100 shadow-sm border-0 bg-white hover-shadow transition">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" class="card-img-top rounded-top" alt="@item.Name" style="height: 180px; object-fit: cover;">
+                                    }
+                                    <div class="card-body d-flex flex-column p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title fw-bold text-dark m-0 pe-2">@item.Name</h5>
+                                            <span class="badge bg-success p-2 fs-6 shadow-sm">$@item.Price.ToString("F2")</span>
+                                        </div>
+                                        <p class="card-text text-muted small flex-grow-1">@item.Description</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+    .transition { transition: all 0.2s ease-in-out; }
+</style>
