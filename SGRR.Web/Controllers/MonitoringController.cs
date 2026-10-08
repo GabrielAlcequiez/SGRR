@@ -20,7 +20,7 @@ public class MonitoringController : Controller
     private User? GetCurrentAdminUser()
     {
         var roleStr = HttpContext.Session.GetString("UserRole");
-        if (roleStr != Roles.Admin.ToString()) return null;
+        if (roleStr != Roles.Administrator.ToString()) return null;
 
         var userIdStr = HttpContext.Session.GetString("UserId");
         if (Guid.TryParse(userIdStr, out Guid userId))

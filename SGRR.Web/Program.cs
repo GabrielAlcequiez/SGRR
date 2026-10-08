@@ -32,6 +32,7 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
 builder.Services.AddSingleton<ISystemActivityLogRepository, CircularActivityLogRepository>();
 builder.Services.AddScoped<IPlatformMonitoringService, PlatformMonitoringService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 
 var app = builder.Build();

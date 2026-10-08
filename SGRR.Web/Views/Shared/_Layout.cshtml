@@ -13,79 +13,80 @@
 <body>
     <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-4">
-        <div class="container">
-            <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">FoodBook</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                
-                <!-- ENLACES PRINCIPALES SEGÚN EL ROL -->
-                <ul class="navbar-nav flex-grow-1">
-                    @{
-                        var role = Context.Session.GetString("UserRole");
-                        var userName = Context.Session.GetString("UserName");
-                    }
+    <div class="container">
+        <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">FoodBook</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            
+            <!-- ENLACES PRINCIPALES SEGÚN EL ROL -->
+            <ul class="navbar-nav flex-grow-1">
+                @{
+                    var role = Context.Session.GetString("UserRole");
+                    var userName = Context.Session.GetString("UserName");
+                }
 
-                    @if (role == "Administrator")
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-primary fw-semibold" asp-controller="Admin" asp-action="Dashboard">Usuarios y Restaurantes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-primary fw-semibold" asp-controller="Category" asp-action="Index">Categorías</a>
-                        </li>
-                    }
-                    else if (role == "Propietary")
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-success fw-semibold" asp-controller="Proprietary" asp-action="Dashboard">Mi Restaurante</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-success fw-semibold" asp-controller="Dish" asp-action="Index">Mi menú</a>
-                        </li>
-                    }
-                    else if (role == "Client")
-                    {
-                        <li class="nav-item">
+                @if (role == "Administrator")
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-semibold" asp-controller="Admin" asp-action="Dashboard">Usuarios y Restaurantes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-semibold" asp-controller="Category" asp-action="Index">Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-semibold" asp-controller="Monitoring" asp-action="Index">Monitoreo y Salud</a>
+                    </li>
+                }
+                else if (role == "Propietary")
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-success fw-semibold" asp-controller="Proprietary" asp-action="Dashboard">Mi Restaurante</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-success fw-semibold" asp-controller="Dish" asp-action="Index">Mi menú</a>
+                    </li>
+                }
+                else if (role == "Client")
+                {
+                    <li class="nav-item">
+                            <a class="nav-link text-info fw-semibold" href="@Url.Action("Index", "RestaurantMenu", new { restaurantId = "11111111-1111-1111-1111-111111111111" })">Explorar Menús</a>
+                        <a class="nav-link text-info fw-semibold" asp-controller="Client" asp-action="Index">Buscar restaurantes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-info fw-semibold" asp-controller="Notificacion" asp-action="Index">Mis notificaciones</a>
+                    </li>
+                }
+            </ul>
 
-                                <a class="nav-link text-info fw-semibold" href="@Url.Action("Index", "RestaurantMenu", new { restaurantId = "11111111-1111-1111-1111-111111111111" })">Explorar Menús</a>
-
-                            <a class="nav-link text-info fw-semibold" asp-controller="Client" asp-action="Index">Buscar restaurantes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-info fw-semibold" asp-controller="Notificacion" asp-action="Index">Mis notificaciones</a>
-                        </li>
-                    }
-                </ul>
-
-                <!-- SECCIÓN DEL USUARIO Y CERRAR SESIÓN -->
-                <ul class="navbar-nav">
-                    @if (!string.IsNullOrEmpty(userName))
-                    {
-                        <li class="nav-item d-flex align-items-center me-3">
-                            <span class="navbar-text text-dark">Hola, <strong class="text-primary">@userName</strong></span>
-                        </li>
-                        <li class="nav-item">
-                            <form asp-controller="Auth" asp-action="Logout" method="post" class="form-inline m-0 p-0">
-                                <button type="submit" class="btn btn-outline-danger btn-sm mt-1">Cerrar sesión</button>
-                            </form>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Iniciar Sesión</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Registrarse</a>
-                        </li>
-                    }
-                </ul>
-            </div>
+            <!-- SECCIÓN DEL USUARIO Y CERRAR SESIÓN -->
+            <ul class="navbar-nav">
+                @if (!string.IsNullOrEmpty(userName))
+                {
+                    <li class="nav-item d-flex align-items-center me-3">
+                        <span class="navbar-text text-dark">Hola, <strong class="text-primary">@userName</strong></span>
+                    </li>
+                    <li class="nav-item">
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="form-inline m-0 p-0">
+                            <button type="submit" class="btn btn-outline-danger btn-sm mt-1">Cerrar sesión</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Registrarse</a>
+                    </li>
+                }
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 </header>
     <div class="container">
         <main role="main" class="pb-3">
