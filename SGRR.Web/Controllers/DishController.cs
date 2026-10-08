@@ -1,106 +1,138 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using SGRR.Data.Interfaces;
 using SGRR.Web.Interfaces;
 using SGRR.Web.Models.Dish;
 
 namespace SGRR.Web.Controllers;
 
-public class DishController : Controller
+public class DishController : OwnerController
 {
     private readonly IDishService _dishService;
 
-    public DishController(IDishService dishService)
+    public DishController(IDishService dishService, IUserRepository userRepository)
+        : base(userRepository)
     {
         _dishService = dishService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Index(Guid restaurantId)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        var dishes = await _dishService.GetByRestaurantIdAsync(restaurantId);
-        ViewBag.RestaurantId = restaurantId;
-        return View(dishes);
+        base.OnActionExecuting(context);
+        if (context.Result is not null)
+            return;
+        if (CurrentOwner.Restaurant is null)
+        {
+            TempData["ErrorMessage"] = "Primero debes crear el perfil de tu restaurante.";
+            context.Result = RedirectToAction("Dashboard", "Proprietary");
+            return;
+        }
+        ViewBag.RestaurantName = CurrentOwner.Restaurant.Name;
     }
 
     [HttpGet]
-    public IActionResult Create(Guid restaurantId)
+    public async Task<IActionResult> Index()
     {
-        return View(new CreateDishDto { RestaurantId = restaurantId });
+        return View(await _dishService.GetByRestaurantIdAsync(CurrentOwner));
     }
+
+    [HttpGet]
+    public IActionResult Create() => View(new CreateDishDto());
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateDishDto dto)
     {
         if (!ModelState.IsValid)
-        {
             return View(dto);
-        }
 
         try
         {
-            await _dishService.CreateAsync(dto);
-            return RedirectToAction(nameof(Index), new { restaurantId = dto.RestaurantId });
+            await _dishService.CreateAsync(dto, CurrentOwner);
+            TempData["SuccessMessage"] = "Plato agregado correctamente.";
+            return RedirectToAction(nameof(Index));
         }
         catch (ArgumentException ex)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(dto);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
 
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var dish = await _dishService.GetByIdAsync(id);
-        if (dish is null)
+        try
         {
-            return NotFound();
+            var dish = await _dishService.GetByIdAsync(id, CurrentOwner);
+            if (dish is null)
+                return NotFound();
+            return View(new UpdateDishDto
+            {
+                Id = dish.Id,
+                Name = dish.Name,
+                Price = dish.Price,
+                Description = dish.Description
+            });
         }
-
-        var dto = new UpdateDishDto
+        catch (UnauthorizedAccessException)
         {
-            Id = dish.Id,
-            Name = dish.Name,
-            Price = dish.Price,
-            Description = dish.Description
-        };
-
-        ViewBag.RestaurantId = dish.RestaurantId;
-        return View(dto);
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(UpdateDishDto dto, Guid restaurantId)
+    public async Task<IActionResult> Edit(UpdateDishDto dto)
     {
-        if (!ModelState.IsValid)
-        {
-            ViewBag.RestaurantId = restaurantId;
-            return View(dto);
-        }
-
         try
         {
-            await _dishService.UpdateAsync(dto);
-            return RedirectToAction(nameof(Index), new { restaurantId });
+            // Comprobar pertenencia incluso si el formulario contiene datos inválidos.
+            if (await _dishService.GetByIdAsync(dto.Id, CurrentOwner) is null)
+                return NotFound();
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            await _dishService.UpdateAsync(dto, CurrentOwner);
+            TempData["SuccessMessage"] = "Plato actualizado correctamente.";
+            return RedirectToAction(nameof(Index));
         }
         catch (KeyNotFoundException)
         {
             return NotFound();
         }
+        catch (UnauthorizedAccessException)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
         catch (ArgumentException ex)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
-            ViewBag.RestaurantId = restaurantId;
             return View(dto);
         }
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(Guid id, Guid restaurantId)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        await _dishService.DeleteAsync(id);
-        return RedirectToAction(nameof(Index), new { restaurantId });
+        try
+        {
+            await _dishService.DeleteAsync(id, CurrentOwner);
+            TempData["SuccessMessage"] = "Plato eliminado correctamente.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
     }
 }

@@ -4,9 +4,6 @@ namespace SGRR.Web.Models.Dish;
 
 public class CreateDishDto
 {
-    [Required(ErrorMessage = "El restaurante es obligatorio.")]
-    public Guid RestaurantId { get; set; }
-
     [Required(ErrorMessage = "El nombre es obligatorio.")]
     public string Name { get; set; } = string.Empty;
 
