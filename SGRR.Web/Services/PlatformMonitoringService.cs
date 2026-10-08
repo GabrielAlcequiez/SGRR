@@ -27,7 +27,7 @@ public class PlatformMonitoringService : IPlatformMonitoringService
 
     public async Task<PlatformDashboardDto> GetSystemHealthAsync(User requestor)
     {
-        if (requestor == null || requestor.Role != Roles.Admin)
+        if (requestor == null || requestor.Role != Roles.Administrator)
         {
             throw new UnauthorizedAccessException("Acceso denegado. Se requieren permisos de Administrador del Sistema.");
         }
