@@ -27,7 +27,10 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddSingleton<ICategoryRepository, InMemoryCategoryRepository>();
 builder.Services.AddSingleton<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
+
 
 var app = builder.Build();
 
