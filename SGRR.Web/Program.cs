@@ -26,7 +26,7 @@ builder.Services.AddSingleton<ICategoryRepository, InMemoryCategoryRepository>()
 builder.Services.AddSingleton<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
-
+builder.Services.AddSingleton<IOrdenesAnticipadasRepository, OrdenesAnticipadasRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
