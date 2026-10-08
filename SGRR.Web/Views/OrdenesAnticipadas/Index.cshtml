@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Órdenes Anticipadas";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <h2 class="mb-4 text-primary">Realizar Orden Anticipada</h2>
+
+        <!-- Banner para mostrar errores o éxito (Criterio de Aceptación) -->
+        <div id="alertMessage" class="alert d-none" role="alert"></div>
+
+        <form id="formOrdenAnticipada" novalidate>
+            <!-- ID de Compra (Simulado) -->
+            <div class="mb-3">
+                <label class="form-label font-weight-bold">ID de Compra</label>
+                <input type="text" class="form-control" id="compraId" value="ORD-2026-001" readonly disabled>
+            </div>
+
+            <!-- Producto -->
+            <div class="mb-3">
+                <label for="producto" class="form-label">Producto *</label>
+                <select class="form-select form-control" id="producto">
+                    <option value="">-- Seleccione un producto --</option>
+                    <option value="1">Menú Ejecutivo</option>
+                    <option value="2">Plato del Día</option>
+                    <option value="3">Combo Especial</option>
+                </select>
+                <small class="text-danger d-none" id="errorProducto">Por favor seleccione un producto.</small>
+            </div>
+
+            <!-- Cantidad -->
+            <div class="mb-3">
+                <label for="cantidad" class="form-label">Cantidad *</label>
+                <input type="number" class="form-control" id="cantidad" min="1" value="1">
+                <small class="text-danger d-none" id="errorCantidad">La cantidad debe ser al menos 1.</small>
+            </div>
+
+            <!-- Fecha -->
+            <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha de Recogida *</label>
+                <input type="date" class="form-control" id="fecha">
+                <small class="text-danger d-none" id="errorFecha">Seleccione una fecha válida.</small>
+            </div>
+
+            <!-- Hora -->
+            <div class="mb-3">
+                <label for="hora" class="form-label">Hora de Recogida *</label>
+                <input type="time" class="form-control" id="hora">
+                <small class="text-danger d-none" id="errorHora">Seleccione una hora válida.</small>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn btn-success px-4">Confirmar Orden</button>
+                <button type="reset" class="btn btn-secondary px-4">Limpiar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('formOrdenAnticipada').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let isValid = true;
+            const producto = document.getElementById('producto').value;
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            const alertBox = document.getElementById('alertMessage');
+
+            // Limpiar errores
+            document.querySelectorAll('.text-danger').forEach(el => el.classList.add('d-none'));
+            alertBox.classList.add('d-none');
+
+            // Validaciones
+            if (!producto) {
+                document.getElementById('errorProducto').classList.remove('d-none');
+                isValid = false;
+            }
+
+            if (isNaN(cantidad) || cantidad <= 0) {
+                document.getElementById('errorCantidad').classList.remove('d-none');
+                isValid = false;
+            }
+
+            if (!fecha) {
+                document.getElementById('errorFecha').classList.remove('d-none');
+                isValid = false;
+            }
+
+            if (!hora) {
+                document.getElementById('errorHora').classList.remove('d-none');
+                isValid = false;
+            }
+
+            // Resultado según Criterio de Aceptación
+            if (!isValid) {
+                alertBox.className = "alert alert-danger d-block";
+                alertBox.textContent = "Error al ingresar los datos: Por favor verifique los campos señalados.";
+            } else {
+                alertBox.className = "alert alert-success d-block";
+                alertBox.textContent = "Orden anticipada procesada correctamente.";
+            }
+        });
+    </script>
+}
