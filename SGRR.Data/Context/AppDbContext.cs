@@ -24,6 +24,10 @@ namespace SGRR.Data.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
 
+        public DbSet<MenuItem> MenuItems { get; set; }
+        public DbSet<RestaurantSchedule> RestaurantSchedules { get; set; }
+
+
         #endregion
     }
 }

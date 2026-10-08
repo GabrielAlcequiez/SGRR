@@ -54,9 +54,41 @@ public static class DbInitializer
         // Asociar el restaurante al propietario usando el método de tu entidad
         proprietary.SetRestaurant(restaurant);
 
+
         // Guardar todos los registros en la base de datos
         context.Users.AddRange(admin, client, proprietary);
         context.Restaurants.Add(restaurant);
         context.SaveChanges();
-    }
+
+       
+       
+
+       
+     
+        //Platos vinculados al ID que se acaba de generar
+        context.MenuItems.AddRange(
+            new MenuItem("Mangú con los Tres Golpes", "Mangú sedoso acompañado de queso frito, salami dominicano y huevo.", 350.00m, "Platos Fuertes", restaurant.Id, "https://picsum.photos"),
+            new MenuItem("Mofongo de Chicharrón", "Plátano verde majado con ajo y chicharrón crujiente.", 450.00m, "Platos Fuertes", restaurant.Id, "https://picsum.photos"),
+            new MenuItem("Yaroa de Pollo", "Capa de papas fritas con pollo desmechado, mucho queso y salsas.", 300.00m, "Entradas", restaurant.Id, "https://picsum.photos"),
+            new MenuItem("Jugo de Morir Soñando", "Tradicional combinación de leche evoporada, naranja y hielo.", 150.00m, "Bebidas", restaurant.Id, "https://picsum.photos")
+        );
+
+        // Horarios semanales de atención
+        for (int i = 0; i < 7; i++)
+        {
+            context.RestaurantSchedules.Add(
+                new RestaurantSchedule(
+                    restaurantId: restaurant.Id,
+                    dayOfWeek: (DayOfWeek)i,
+                    openingTime: new TimeSpan(12, 0, 0), // 12:00 PM
+                    closingTime: new TimeSpan(22, 0, 0)  // 10:00 PM
+                )
+            );
+        }
+
+        
+        context.SaveChanges();
+    } 
+
+    
 }
