@@ -20,11 +20,18 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<IDishRepository, DishRepository>();
+builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddSingleton<ICategoryRepository, InMemoryCategoryRepository>();
+builder.Services.AddSingleton<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<INotificacionService, NotificacionService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,9 +60,11 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<SGRR.Data.Context.AppDbContext>();
-    
+
     // Llamamos al inicializador que acabamos de crear en la capa Data
     SGRR.Data.Context.DbInitializer.Initialize(context);
+    var notificationRepository = services.GetRequiredService<INotificacionRepository>();
+    DbInitializer.InitializeNotifications(context, notificationRepository);
 }
 
 app.Run();

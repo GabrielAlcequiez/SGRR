@@ -1,21 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using SGRR.Data.Interfaces;
 
 namespace SGRR.Web.Controllers;
 
-public class ProprietaryController : Controller
+public class ProprietaryController : OwnerController
 {
-    public IActionResult Dashboard()
+    public ProprietaryController(IUserRepository userRepository) : base(userRepository)
     {
-        if (HttpContext.Session.GetString("UserId") is null)
-        {
-            return RedirectToAction("Login", "Auth");
-        }
-
-        if (HttpContext.Session.GetString("UserRole") != "Propietary")
-        {
-            return RedirectToAction("Index", "Home");
-        }
-
-        return View();
     }
+
+    [HttpGet]
+    public IActionResult Dashboard() => View(CurrentOwner.Restaurant);
 }

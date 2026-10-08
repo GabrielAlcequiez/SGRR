@@ -51,6 +51,14 @@ namespace SGRR.Data.Repositories
             var restaurant = await _context.Restaurants.FindAsync(id);
             if (restaurant != null)
             {
+                var owners = await _context.Users.Include(user => user.Restaurant)
+                    .Where(user => user.Restaurant != null && user.Restaurant.Id == id)
+                    .ToListAsync();
+                foreach (var owner in owners)
+                    owner.ClearRestaurant();
+
+                var dishes = await _context.Dishes.Where(dish => dish.RestaurantId == id).ToListAsync();
+                _context.Dishes.RemoveRange(dishes);
                 _context.Restaurants.Remove(restaurant);
                 await _context.SaveChangesAsync();
             }

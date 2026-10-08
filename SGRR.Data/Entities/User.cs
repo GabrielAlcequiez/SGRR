@@ -43,6 +43,11 @@ public class User
         Restaurant = restaurant;
     }
 
+    public void ClearRestaurant()
+    {
+        Restaurant = null;
+    }
+
     // Añadido para manejar el bloqueo de cuentas.
     public void SetActive(bool isActive)
     {

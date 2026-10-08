@@ -1,0 +1,31 @@
+@model SGRR.Web.Models.Restaurant.UpdateRestaurantDto
+@{
+    ViewData["Title"] = "Editar perfil del restaurante";
+}
+<h1 class="h2 mb-4">Editar perfil del restaurante</h1>
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Nombre</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Specialty" class="form-label">Especialidad</label>
+        <input asp-for="Specialty" class="form-control" />
+        <span asp-validation-for="Specialty" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label">Ubicación</label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Descripción</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-controller="Proprietary" asp-action="Dashboard" class="btn btn-outline-secondary">Volver a mi restaurante</a>
+</form>

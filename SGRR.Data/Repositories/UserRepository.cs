@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SGRR.Data.Context;
 using SGRR.Data.Entities;
 using SGRR.Data.Interfaces;
@@ -55,7 +56,7 @@ public class UserRepository : IUserRepository
 
     public User? GetById(Guid id)
     {
-        return _context.Users.Find(id);
+        return _context.Users.Include(user => user.Restaurant).FirstOrDefault(user => user.Id == id);
     }
 
     public bool ExistsByEmail(string email)
