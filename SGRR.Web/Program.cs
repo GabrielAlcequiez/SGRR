@@ -32,6 +32,13 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
 
 
+
+
+
+builder.Services.AddScoped<SGRR.Data.Interfaces.IReservationRepository, SGRR.Data.Repositories.ReservationRepository>();
+builder.Services.AddScoped<SGRR.Web.Interfaces.IReservationService, SGRR.Web.Services.ReservationService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

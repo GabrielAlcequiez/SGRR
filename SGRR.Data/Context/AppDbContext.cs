@@ -37,6 +37,9 @@ namespace SGRR.Data.Context
         public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<RestaurantSchedule> RestaurantSchedules { get; set; }
 
+        
+        public DbSet<Reservation> Reservations { get; set; }
+
 
         #endregion
     }
