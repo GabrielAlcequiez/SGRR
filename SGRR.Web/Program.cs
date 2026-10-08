@@ -30,14 +30,9 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
-
-
-
-
-
 builder.Services.AddScoped<SGRR.Data.Interfaces.IReservationRepository, SGRR.Data.Repositories.ReservationRepository>();
-builder.Services.AddScoped<SGRR.Web.Interfaces.IReservationService, SGRR.Web.Services.ReservationService>();
-
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddSingleton<IOrdenesAnticipadasRepository, OrdenesAnticipadasRepository>();
 
 var app = builder.Build();
 
