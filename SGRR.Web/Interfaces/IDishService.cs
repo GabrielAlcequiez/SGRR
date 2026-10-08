@@ -5,10 +5,10 @@ namespace SGRR.Web.Interfaces
 {
     public interface IDishService
     {
-        Task<IEnumerable<Dish>> GetByRestaurantIdAsync(Guid restaurantId);
-        Task<Dish?> GetByIdAsync(Guid id);
-        Task<Dish> CreateAsync(CreateDishDto dto);
-        Task UpdateAsync(UpdateDishDto dto);
-        Task DeleteAsync(Guid id);
+        Task<IEnumerable<Dish>> GetByRestaurantIdAsync(User requestor);
+        Task<Dish?> GetByIdAsync(Guid id, User requestor);
+        Task<Dish> CreateAsync(CreateDishDto dto, User requestor);
+        Task UpdateAsync(UpdateDishDto dto, User requestor);
+        Task DeleteAsync(Guid id, User requestor);
     }
 }

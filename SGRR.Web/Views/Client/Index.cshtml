@@ -1,5 +1,40 @@
+@model IEnumerable<SGRR.Data.Entities.Restaurant>
 @{
-    ViewData["Title"] = "Cliente";
+    ViewData["Title"] = "Buscar restaurantes";
 }
 
-<h1>Hello Client</h1>
+<h1 class="h2 mb-4">Buscar restaurantes</h1>
+<form asp-action="Index" method="get" class="mb-4">
+    <label for="search" class="form-label">Nombre, especialidad o ubicación</label>
+    <div class="d-flex flex-wrap gap-2">
+        <input id="search" name="search" value="@ViewBag.Search" class="form-control flex-grow-1 w-auto" placeholder="Buscar restaurantes" />
+        <button class="btn btn-primary" type="submit">Buscar</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Limpiar</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info" role="status">No se encontraron restaurantes</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var restaurant in Model)
+        {
+            <div class="col-md-6">
+                <article class="card h-100">
+                    <div class="card-body">
+                        <h2 class="h5 text-break">@restaurant.Name</h2>
+                        <p class="mb-1 text-break"><strong>Especialidad:</strong> @restaurant.Specialty</p>
+                        <p class="mb-2 text-break"><strong>Ubicación:</strong> @restaurant.Location</p>
+                        @if (!string.IsNullOrWhiteSpace(restaurant.Description))
+                        {
+                            <p class="card-text text-break">@restaurant.Description</p>
+                        }
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}
