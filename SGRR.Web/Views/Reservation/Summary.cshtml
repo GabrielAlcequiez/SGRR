@@ -1,0 +1,62 @@
+﻿@model SGRR.Web.Models.CreateReservationViewModel
+
+@{
+    ViewData["Title"] = "Confirmar Reserva";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow border-0 rounded-3 bg-white">
+        <div class="card-header bg-dark text-white py-3 text-center rounded-top">
+            <h3 class="m-0 fw-bold">Resumen de la Reserva</h3>
+            <p class="mb-0 small opacity-75">Verifique los datos antes de confirmar el registro</p>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="list-group list-group-flush mb-4">
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <span class="text-muted fw-semibold">Establecimiento:</span>
+                    <span class="text-dark fw-bold">@Model.RestaurantName</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <span class="text-muted fw-semibold">Fecha Seleccionada:</span>
+                    <span class="text-dark fw-bold">@Model.Date.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <span class="text-muted fw-semibold">Bloque de Horario:</span>
+                    <span class="text-dark fw-bold">@Model.TimeSlot</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <span class="text-muted fw-semibold">Cantidad de Personas:</span>
+                    <span class="text-dark fw-bold">@Model.PeopleCount</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <span class="text-muted fw-semibold">Ubicación de Mesa:</span>
+                    <span class="text-dark fw-bold">@Model.TableLocation</span>
+                </div>
+            </div>
+
+            <!-- Formulario final que ejecuta la inserción real en la capa Data -->
+            <form asp-controller="Reservation" asp-action="SubmitConfirmation" method="post">
+                <input type="hidden" asp-for="RestaurantId" />
+                <input type="hidden" asp-for="RestaurantName" />
+                <input type="hidden" asp-for="Date" />
+                <input type="hidden" asp-for="TimeSlot" />
+                <input type="hidden" asp-for="PeopleCount" />
+                <input type="hidden" asp-for="TableLocation" />
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <a asp-controller="Client" asp-action="Index" class="btn btn-outline-secondary btn-lg w-100 py-3 fw-bold">
+                            Cancelar
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold text-uppercase shadow">
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
