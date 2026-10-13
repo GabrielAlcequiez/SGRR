@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SGRR.Data.Context;
 using SGRR.Data.Entities;
 using SGRR.Data.Interfaces;
+using SGRR.Data.Models;
 
 namespace SGRR.Data.Repositories
 {
@@ -17,6 +18,29 @@ namespace SGRR.Data.Repositories
         public async Task<IEnumerable<Restaurant>> GetAllAsync()
         {
             return await _context.Restaurants.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Restaurant>> SearchAsync(RestaurantSearchFilterDto filters)
+        {
+            ArgumentNullException.ThrowIfNull(filters);
+            var query = _context.Restaurants.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filters.Specialty))
+            {
+                var specialty = filters.Specialty.Trim().ToLowerInvariant();
+                query = query.Where(restaurant => restaurant.Specialty.ToLower().Contains(specialty));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Location))
+            {
+                var location = filters.Location.Trim().ToLowerInvariant();
+                query = query.Where(restaurant => restaurant.Location.ToLower().Contains(location));
+            }
+
+            if (filters.MinimumRating.HasValue)
+                query = query.Where(restaurant => restaurant.Rating >= filters.MinimumRating.Value);
+
+            return await query.ToListAsync();
         }
 
         public async Task<Restaurant?> GetByIdAsync(Guid id)
