@@ -66,7 +66,8 @@ namespace SGRR.Data.Repositories
 
         public async Task UpdateAsync(Restaurant restaurant)
         {
-            _context.Restaurants.Update(restaurant);
+            if (_context.Entry(restaurant).State == EntityState.Detached)
+                _context.Restaurants.Update(restaurant);
             await _context.SaveChangesAsync();
         }
 
@@ -83,6 +84,8 @@ namespace SGRR.Data.Repositories
 
                 var dishes = await _context.Dishes.Where(dish => dish.RestaurantId == id).ToListAsync();
                 _context.Dishes.RemoveRange(dishes);
+                var reviews = await _context.Reviews.Where(review => review.RestaurantId == id).ToListAsync();
+                _context.Reviews.RemoveRange(reviews);
                 _context.Restaurants.Remove(restaurant);
                 await _context.SaveChangesAsync();
             }
