@@ -40,7 +40,7 @@ builder.Services.AddSingleton<IOrdenesAnticipadasRepository, OrdenesAnticipadasR
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IOwnerNotificationService, OwnerNotificationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
+builder.Services.AddScoped<IOwnerMetricsService, OwnerMetricsService>();
 
 var app = builder.Build();
 
