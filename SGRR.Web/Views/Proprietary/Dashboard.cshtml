@@ -1,41 +1,65 @@
-@model SGRR.Data.Entities.Restaurant
+@using SGRR.Data.Common.Enums
+@model SGRR.Web.Models.Owner.OwnerDashboardDto
+
 @{
-    ViewData["Title"] = "Mi restaurante";
+    ViewData["Title"] = "Panel de Estadísticas y Analítica";
 }
 
-<h1 class="h2 mb-4">Mi restaurante</h1>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up-arrow"></i> Panel de Estadísticas y Analítica</h2>
+        
+        <!-- Selector de Filtro de Tiempo (RF-13) -->
+        <form method="get" asp-action="Dashboard" class="d-flex align-items-center gap-2">
+            <label for="filter" class="fw-bold me-2">Período:</label>
+            <select name="filter" id="filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="@TimeRangeFilter.AllTime" selected="@(Model.CurrentFilter == TimeRangeFilter.AllTime)">Histórico Completo</option>
+                <option value="@TimeRangeFilter.Last7Days" selected="@(Model.CurrentFilter == TimeRangeFilter.Last7Days)">Últimos 7 días</option>
+                <option value="@TimeRangeFilter.Today" selected="@(Model.CurrentFilter == TimeRangeFilter.Today)">Hoy</option>
+            </select>
+        </form>
+    </div>
 
-@if (TempData["SuccessMessage"] is string success)
-{
-    <div class="alert alert-success" role="status">@success</div>
-}
-@if (TempData["ErrorMessage"] is string error)
-{
-    <div class="alert alert-danger" role="alert">@error</div>
-}
+    <!-- Tarjetas KPI (RF-13) -->
+    <div class="row g-3 mb-4">
+        <!-- Ingresos Totales -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-white-50">Ingresos Totales Acumulados</h6>
+                    <h3 class="card-title fw-bold mb-0">@Model.TotalRevenue.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
 
-@if (Model is null)
-{
-    <div class="alert alert-info">Todavía no tienes un restaurante asociado.</div>
-    <a class="btn btn-primary" asp-controller="Restaurant" asp-action="Create">Crear perfil del restaurante</a>
-}
-else
-{
-    <div class="card">
-        <div class="card-body">
-            <h2 class="h4 text-break">@Model.Name</h2>
-            <dl class="row mb-3">
-                <dt class="col-sm-3">Especialidad</dt>
-                <dd class="col-sm-9 text-break">@Model.Specialty</dd>
-                <dt class="col-sm-3">Ubicación</dt>
-                <dd class="col-sm-9 text-break">@Model.Location</dd>
-                <dt class="col-sm-3">Descripción</dt>
-                <dd class="col-sm-9 text-break">@(string.IsNullOrWhiteSpace(Model.Description) ? "Sin descripción." : Model.Description)</dd>
-            </dl>
-            <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-primary" asp-controller="Restaurant" asp-action="Edit" asp-route-id="@Model.Id">Editar perfil</a>
-                <a class="btn btn-outline-primary" asp-controller="Dish" asp-action="Index">Mi menú</a>
+        <!-- Órdenes Completadas -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-white-50">Órdenes Completadas</h6>
+                    <h3 class="card-title fw-bold mb-0">@Model.CompletedOrdersCount</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Promedio -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-warning text-dark h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-dark-50">Ticket Promedio</h6>
+                    <h3 class="card-title fw-bold mb-0">@Model.AverageTicket.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservas Confirmadas -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-info text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-white-50">Reservas Confirmadas</h6>
+                    <h3 class="card-title fw-bold mb-0">@Model.ConfirmedReservationsCount</h3>
+                </div>
             </div>
         </div>
     </div>
-}
+</div>

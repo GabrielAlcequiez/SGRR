@@ -17,18 +17,23 @@ public class ProprietaryController : OwnerController
         _metricsService = metricsService;
     }
 
+    // Acción para el Panel de Estadísticas y Analítica (RF-13)
     [HttpGet]
     public async Task<IActionResult> Dashboard(TimeRangeFilter filter = TimeRangeFilter.AllTime)
     {
-        // Validar que el propietario tenga un restaurante asociado a su cuenta
         if (CurrentOwner.Restaurant == null)
         {
             return View(new OwnerDashboardDto());
         }
 
-        // Obtener las métricas usando el ID del restaurante del propietario actual
         var metrics = await _metricsService.GetDashboardMetricsAsync(CurrentOwner.Restaurant.Id, filter);
-        
         return View(metrics);
+    }
+
+    // Acción para la gestión del perfil de "Mi Restaurante"
+    [HttpGet]
+    public IActionResult MiRestaurante()
+    {
+        return View(CurrentOwner.Restaurant);
     }
 }
