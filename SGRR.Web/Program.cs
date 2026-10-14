@@ -37,6 +37,10 @@ builder.Services.AddScoped<INotificacionService, NotificacionService>();
 builder.Services.AddScoped<SGRR.Data.Interfaces.IReservationRepository, SGRR.Data.Repositories.ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddSingleton<IOrdenesAnticipadasRepository, OrdenesAnticipadasRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IOwnerNotificationService, OwnerNotificationService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 
 var app = builder.Build();
 

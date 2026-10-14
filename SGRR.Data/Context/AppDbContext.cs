@@ -49,5 +49,7 @@ namespace SGRR.Data.Context
 
 
         #endregion
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
     }
 }
