@@ -1,0 +1,114 @@
+@model SGRR.Web.Models.ReviewPageViewModel
+@{
+    ViewData["Title"] = $"Reseñas de {Model.RestaurantName}";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <a asp-controller="Client" asp-action="Index" class="text-decoration-none">&larr; Buscar restaurantes</a>
+        <h1 class="h2 mt-2 mb-1">Reseñas de @Model.RestaurantName</h1>
+        <p class="text-muted mb-0">
+            @if (Model.AverageRating.HasValue)
+            {
+                <span class="fw-semibold">@Model.AverageRating.Value.ToString("0.0") / 5</span>
+                <span class="text-warning" aria-label="Calificación promedio">★</span>
+            }
+            else
+            {
+                <span>Sin calificaciones todavía</span>
+            }
+            <span> · @Model.ReviewCount reseña(s)</span>
+        </p>
+    </div>
+    <div class="btn-group" role="group" aria-label="Ordenar reseñas">
+        <a asp-action="Index" asp-route-restaurantId="@Model.RestaurantId" asp-route-sortOrder="NewestFirst"
+           class="btn @(Model.SortOrder == SGRR.Data.Common.Enums.ReviewSortOrder.NewestFirst ? "btn-primary" : "btn-outline-primary")">Más recientes</a>
+        <a asp-action="Index" asp-route-restaurantId="@Model.RestaurantId" asp-route-sortOrder="OldestFirst"
+           class="btn @(Model.SortOrder == SGRR.Data.Common.Enums.ReviewSortOrder.OldestFirst ? "btn-primary" : "btn-outline-primary")">Más antiguas</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">@successMessage</div>
+}
+
+<section class="card mb-4" aria-labelledby="new-review-heading">
+    <div class="card-body">
+        <h2 id="new-review-heading" class="h5">Comparte tu experiencia</h2>
+        <form asp-action="Create" method="post">
+            <input asp-for="RestaurantId" type="hidden" />
+            <input asp-for="SortOrder" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <fieldset class="mb-3">
+                <legend class="form-label fs-6">Tu puntuación</legend>
+                <div class="star-picker" role="radiogroup" aria-label="Selecciona de 1 a 5 estrellas">
+                    @for (var star = 5; star >= 1; star--)
+                    {
+                        <input asp-for="Rating" type="radio" id="new-rating-@star" value="@star" />
+                        <label for="new-rating-@star" title="@star estrella(s)">★</label>
+                    }
+                </div>
+                <span asp-validation-for="Rating" class="text-danger small d-block"></span>
+            </fieldset>
+
+            <div class="mb-3">
+                <label asp-for="Comment" class="form-label">Comentario</label>
+                <textarea asp-for="Comment" class="form-control" rows="4" maxlength="1000"
+                          placeholder="Cuéntale a la comunidad cómo fue tu experiencia"></textarea>
+                <div class="form-text">Máximo 1000 caracteres.</div>
+                <span asp-validation-for="Comment" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Publicar reseña</button>
+        </form>
+    </div>
+</section>
+
+<section aria-labelledby="reviews-heading">
+    <h2 id="reviews-heading" class="h4 mb-3">Opiniones de clientes</h2>
+    @if (!Model.Reviews.Any())
+    {
+        <div class="alert alert-info" role="status">Este restaurante todavía no tiene reseñas.</div>
+    }
+    else
+    {
+        <div class="d-grid gap-3">
+            @foreach (var review in Model.Reviews)
+            {
+                <article class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                            <div>
+                                <h3 class="h6 mb-1">@review.CustomerName</h3>
+                                <time class="text-muted small" datetime="@review.CreatedAt.ToString("O")">
+                                    @review.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </time>
+                            </div>
+                            <span class="badge text-bg-warning" aria-label="@review.Rating de 5 estrellas">
+                                <span aria-hidden="true">@string.Concat(Enumerable.Repeat("★", review.Rating))</span>
+                                @review.Rating/5
+                            </span>
+                        </div>
+                        <p class="review-comment mt-3 mb-0">@review.Comment</p>
+
+                        @if (review.CustomerId == Model.CurrentCustomerId)
+                        {
+                            <div class="d-flex gap-2 mt-3">
+                                <a asp-action="Edit" asp-route-reviewId="@review.Id" class="btn btn-sm btn-outline-primary">Editar</a>
+                                <form asp-action="Delete" asp-route-reviewId="@review.Id" method="post"
+                                      onsubmit="return confirm('¿Eliminar esta reseña?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

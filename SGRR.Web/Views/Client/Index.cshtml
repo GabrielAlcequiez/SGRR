@@ -41,11 +41,12 @@ else if (ViewData.ModelState.IsValid)
                         <h2 class="h5 text-break">@restaurant.Name</h2>
                         <p class="mb-1 text-break"><strong>Especialidad:</strong> @restaurant.Specialty</p>
                         <p class="mb-2 text-break"><strong>Ubicación:</strong> @restaurant.Location</p>
-                        <p class="mb-2"><strong>Evaluación:</strong> @(restaurant.Rating.HasValue ? restaurant.Rating.Value.ToString("0.0") : "Sin evaluación")</p>
+                        <p class="mb-2"><strong>Evaluación:</strong> @(restaurant.Rating.HasValue ? restaurant.Rating.Value.ToString("0.0") : "Sin evaluación") (@restaurant.ReviewCount reseña(s))</p>
                         @if (!string.IsNullOrWhiteSpace(restaurant.Description))
                         {
                             <p class="card-text text-break">@restaurant.Description</p>
                         }
+                        <a asp-controller="Review" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-outline-primary btn-sm mt-2">Ver reseñas y opinar</a>
                     </div>
                 </article>
             </div>

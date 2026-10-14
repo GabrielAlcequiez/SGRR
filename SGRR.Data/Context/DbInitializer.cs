@@ -49,7 +49,6 @@ public static class DbInitializer
             Name = "El Sazón Dominicano",
             Specialty = "Comida Criolla",
             Location = "Santo Domingo Este",
-            Rating = 4.5m,
             Description = "El mejor mangú y yaroa de la zona oriental."
         };
 

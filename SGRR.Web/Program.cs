@@ -19,9 +19,12 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IRestaurantSearchService, RestaurantSearchService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddSingleton<IRestaurantReviewLock, RestaurantReviewLock>();
 builder.Services.AddScoped<IDishRepository, DishRepository>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
