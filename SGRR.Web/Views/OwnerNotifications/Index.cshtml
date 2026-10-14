@@ -1,4 +1,4 @@
-@model IEnumerable<SGRR.Data.Entities.Notification>
+@model IEnumerable<SGRR.Web.Models.Owner.OwnerNotificationViewModel>
 
 @{
     ViewData["Title"] = "Notificaciones de Órdenes y Reservas";
@@ -19,14 +19,14 @@
         <div class="list-group mt-3">
             @foreach (var notification in Model)
             {
-                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(notification.IsRead ? "" : "list-group-item-warning")">
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @notification.RowStatusClass">
                     <div>
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">@notification.Title</h5>
-                            <small class="text-muted">@notification.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            <small class="text-muted">@notification.CreatedAtFormatted</small>
                         </div>
                         <p class="mb-1">@notification.Message</p>
-                        <small class="badge bg-@(notification.Type == "Reservation" ? "primary" : "success")">@notification.Type</small>
+                        <span class="badge bg-@notification.TypeBadgeClass">@notification.Type</span>
                     </div>
                     
                     @if (!notification.IsRead)

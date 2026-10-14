@@ -1,6 +1,7 @@
 using SGRR.Data.Entities;
 using SGRR.Data.Interfaces;
 using SGRR.Web.Interfaces;
+using SGRR.Web.Models.Owner;
 
 namespace SGRR.Web.Services;
 
@@ -13,9 +14,19 @@ public class OwnerNotificationService : IOwnerNotificationService
         _notificationRepository = notificationRepository;
     }
 
-    public async Task<IEnumerable<Notification>> GetOwnerNotificationsAsync(Guid restaurantId)
+    public async Task<IEnumerable<OwnerNotificationViewModel>> GetOwnerNotificationsAsync(Guid restaurantId)
     {
-        return await _notificationRepository.GetByRestaurantIdAsync(restaurantId);
+        var notifications = await _notificationRepository.GetByRestaurantIdAsync(restaurantId);
+
+        return notifications.Select(n => new OwnerNotificationViewModel
+        {
+            Id = n.Id,
+            Title = n.Title,
+            Message = n.Message,
+            Type = n.Type,
+            IsRead = n.IsRead,
+            CreatedAtFormatted = n.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+        }).ToList();
     }
 
     public async Task<int> GetUnreadCountAsync(Guid restaurantId)
