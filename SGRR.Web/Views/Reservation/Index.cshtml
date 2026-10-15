@@ -1,0 +1,43 @@
+@model IReadOnlyList<SGRR.Data.Entities.Reservation>
+@{
+    ViewData["Title"] = "Mis reservas";
+    var restaurants = (Dictionary<Guid, string>)ViewBag.Restaurants;
+}
+<h1>Mis reservas</h1>
+@if (TempData["ReservationMessage"] is string message)
+{
+    <div class="alert alert-info" role="status">@message</div>
+}
+<a asp-controller="Client" asp-action="Index" class="btn btn-primary mb-3">Buscar restaurante</a>
+@if (Model.Count == 0)
+{
+    <p>No tiene reservas registradas.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Restaurante</th><th>Fecha</th><th>Hora</th><th>Personas</th><th>Ubicación</th><th>Código</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            @foreach (var reservation in Model)
+            {
+                <tr>
+                    <td>@restaurants.GetValueOrDefault(reservation.RestaurantId, "Restaurante no disponible")</td>
+                    <td>@reservation.Date.ToString("dd/MM/yyyy")</td><td>@reservation.TimeSlot</td>
+                    <td>@reservation.PeopleCount</td><td>@reservation.TableLocation</td>
+                    <td>@reservation.ReservationCode</td><td>@(reservation.Status == "Active" ? "Activa" : "Cancelada")</td>
+                    <td>
+                    @if (reservation.Status == "Active")
+                    {
+                        <form asp-action="Cancel" method="post">
+                            <input type="hidden" name="reservationId" value="@reservation.Id" />
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Cancelar</button>
+                        </form>
+                    }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

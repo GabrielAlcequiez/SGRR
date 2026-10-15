@@ -1,4 +1,4 @@
-﻿@model SGRR.Web.Models.CreateReservationViewModel
+@model SGRR.Web.Models.CreateReservationViewModel
 
 @{
     ViewData["Title"] = "Realizar Reserva";
@@ -19,7 +19,7 @@
                 </div>
             }
 
-            <form asp-controller="Reservation" asp-action="ConfirmSummary" method="post">
+            <form asp-controller="Reservation" asp-action="ConfirmSummary" method="post"><div asp-validation-summary="All" class="text-danger"></div>
                 <input type="hidden" asp-for="RestaurantId" />
                 <input type="hidden" asp-for="RestaurantName" />
 
@@ -28,6 +28,7 @@
                     <input asp-for="Date" type="date" class="form-control form-control-lg border-2"
                            min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                     <span asp-validation-for="Date" class="text-danger small"></span>
+                    <button type="submit" class="btn btn-outline-secondary mt-2" formaction="@Url.Action("RefreshHours", "Reservation")" formnovalidate>Consultar horarios de esta fecha</button>
                 </div>
 
                 <div class="mb-3">
@@ -50,18 +51,20 @@
                 </div>
 
                 <div class="mb-4">
+                    @if (ViewBag.HoursUpdated == true)
+                    {
+                        <p class="text-success" role="status">Horarios actualizados para el @Model.Date.ToString("dd/MM/yyyy") según la cantidad de asistentes indicada.</p>
+                    }
                     <label asp-for="TimeSlot" class="form-label fw-semibold text-secondary">4. Bloque de Horario:</label>
                     <select asp-for="TimeSlot" class="form-select form-select-lg border-2" required>
                         <option value="">-- Seleccionar hora disponible --</option>
-                        <option value="12:00 Hs">12:00 Hs</option>
-                        <option value="12:30 Hs">12:30 Hs</option>
-                        <option value="13:00 Hs">13:00 Hs</option>
-                        <option value="18:30 Hs">18:30 Hs</option>
-                        <option value="19:00 Hs">19:00 Hs</option>
-                        <option value="19:30 Hs">19:30 Hs</option>
-                        <option value="20:00 Hs">20:00 Hs</option>
+                        @foreach (var hour in (List<string>)ViewBag.AvailableHours) { <option value="@hour">@hour</option> }
                     </select>
                     <span asp-validation-for="TimeSlot" class="text-danger small"></span>
+                    @if (((List<string>)ViewBag.AvailableHours).Count == 0)
+                    {
+                        <p class="text-warning">No hay horarios disponibles. Seleccione otra fecha y consulte sus horarios.</p>
+                    }
                 </div>
 
                 <button type="submit" class="btn btn-success btn-lg w-100 shadow fw-bold py-3 text-uppercase">
