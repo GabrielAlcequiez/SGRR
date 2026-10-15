@@ -1,4 +1,4 @@
-﻿F@model SGRR.Web.Models.RestaurantMenuViewModel
+@model SGRR.Web.Models.RestaurantMenuViewModel
 
 @{
     ViewData["Title"] = "Menú Interactivo y Disponibilidad";
@@ -42,7 +42,7 @@
                         }
                         else
                         {
-                            <select class="form-select form-select-lg border-2">
+                            <select name="timeSlot" form="reservationForm" class="form-select form-select-lg border-2" required>
                                 <option value="">-- Seleccionar un bloque de tiempo --</option>
                                 @foreach (var hour in Model.AvailableHours)
                                 {
@@ -53,10 +53,14 @@
                         }
                     </div>
 
-                    <a href="@Url.Action("Create", "Reservation", new { restaurantId = Model.RestaurantId, restaurantName = Model.RestaurantName })"
-                       class="btn btn-primary btn-lg w-100 mt-3 shadow">
-                        Proceder con la Reserva
-                    </a>
+                    @if (string.IsNullOrEmpty(Model.ScheduleErrorMessage))
+                    {
+                        <form asp-controller="Reservation" asp-action="Create" method="get" id="reservationForm">
+                            <input type="hidden" name="restaurantId" value="@Model.RestaurantId" />
+                            <input type="hidden" name="date" value="@ViewBag.SelectedDate" />
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 shadow">Proceder con la Reserva</button>
+                        </form>
+                    }
 
 
                 </div>

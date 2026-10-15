@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,7 +55,7 @@
                     {
                         <li class="nav-item">
 
-                                <a class="nav-link text-info fw-semibold" href="@Url.Action("Index", "RestaurantMenu", new { restaurantId = "11111111-1111-1111-1111-111111111111" })">Explorar Menús</a>
+                                <a class="nav-link text-info fw-semibold" asp-controller="Reservation" asp-action="Index">Mis reservas</a>
 
                             <a class="nav-link text-info fw-semibold" asp-controller="Client" asp-action="Index">Buscar restaurantes</a>
                         </li>
