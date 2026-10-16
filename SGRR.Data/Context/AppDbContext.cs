@@ -39,7 +39,6 @@ namespace SGRR.Data.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<Dish> Dishes { get; set; }
 
         public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<RestaurantSchedule> RestaurantSchedules { get; set; }
