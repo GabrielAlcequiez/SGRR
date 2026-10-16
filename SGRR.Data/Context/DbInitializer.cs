@@ -82,9 +82,51 @@ public static class DbInitializer
             );
         }
 
-        
+        // Pedidos de prueba para los reportes admin (Rendimiento por Restaurante y Balance de Ventas).
+        // Se reparten en los últimos 45 días con montos variados y mezcla de estados para conciliaciones.
+        var random = new Random(42); // semilla fija para resultados reproducibles
+        var seededOrders = new List<Order>();
+
+        for (int daysAgo = 0; daysAgo < 45; daysAgo++)
+        {
+            int ordersThatDay = random.Next(0, 4); // 0 a 3 pedidos por día
+
+            for (int j = 0; j < ordersThatDay; j++)
+            {
+                // 80% completados, 10% pendientes y 10% cancelados
+                int statusRoll = random.Next(0, 10);
+                var status = statusRoll < 8 ? "Completed" : statusRoll < 9 ? "Pending" : "Cancelled";
+
+                seededOrders.Add(new Order
+                {
+                    RestaurantId = restaurant.Id,
+                    ClientId = client.Id,
+                    TotalAmount = random.Next(2, 13) * 100.00m, // de 200.00 a 1,200.00
+                    Status = status,
+                    CreatedAt = DateTime.Today.AddDays(-daysAgo).AddHours(random.Next(12, 21))
+                });
+            }
+        }
+
+        context.Orders.AddRange(seededOrders);
+
+        // Reservas activas de prueba en los últimos 30 días para la columna de reservas confirmadas
+        var seededReservations = Enumerable.Range(0, 8).Select(i => new Reservation
+        {
+            ClientId = client.Id,
+            RestaurantId = restaurant.Id,
+            Date = DateTime.Today.AddDays(-(i * 3 + 1)), // cada 3 días hacia atrás
+            TimeSlot = "19:00",
+            PeopleCount = random.Next(1, 6),
+            TableLocation = "Interior",
+            ReservationCode = $"BK-SEED-{i + 1:D4}",
+            Status = "Active"
+        }).ToList();
+
+        context.Reservations.AddRange(seededReservations);
+
         context.SaveChanges();
-    } 
+    }
 
     public static void InitializeNotifications(
         AppDbContext context,
