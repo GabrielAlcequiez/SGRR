@@ -23,6 +23,15 @@
     </div>
 }
 
+@if (TempData["PagoError"] is string pagoError)
+{
+    <div class="alert alert-danger" role="alert">@pagoError</div>
+}
+
+@if (TempData["PagoExito"] is string pagoExito)
+{
+    <div class="alert alert-success" role="status">@pagoExito</div>
+}
 <a asp-controller="Client" asp-action="Index" class="btn btn-primary mb-3">Buscar restaurante</a>
 
 @if (Model.Count == 0)
@@ -42,6 +51,7 @@ else
                     <th>Entrega</th>
                     <th>Total</th>
                     <th>Estado</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,6 +71,14 @@ else
                         </td>
                         <td>$@orden.Total.ToString("N2")</td>
                         <td><span class="badge @BadgeClass(orden.Estado)">@orden.Estado</span></td>
+                        <td>
+                            <a asp-controller="Pagos"
+                               asp-action="Index"
+                               asp-route-id="@orden.Id"
+                               class="btn btn-sm btn-success">
+                                Proceder al pago
+                            </a>
+                        </td>
                     </tr>
                 }
             </tbody>

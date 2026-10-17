@@ -56,6 +56,8 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IOwnerMetricsService, OwnerMetricsService>();
 builder.Services.AddScoped<IAdminReportService, AdminReportService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
+builder.Services.AddScoped<IPaymentGateway, PaymentGatewayMock>();
+builder.Services.AddScoped<IPagoService, PagoService>();
 
 var app = builder.Build();
 
