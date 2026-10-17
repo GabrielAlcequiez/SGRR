@@ -60,9 +60,12 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IOwnerMetricsService, OwnerMetricsService>();
 builder.Services.AddScoped<IAdminReportService, AdminReportService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
+builder.Services.AddScoped<IPaymentGateway, PaymentGatewayMock>();
+builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddSingleton<SGRR.Data.Interfaces.ISystemActivityLogRepository, SGRR.Data.Repositories.CircularActivityLogRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPlatformMonitoringService, PlatformMonitoringService>();
+
 
 var app = builder.Build();
 
