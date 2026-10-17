@@ -9,4 +9,5 @@ public interface IOwnerNotificationService
     Task MarkAsReadAsync(Guid notificationId);
     Task NotifyNewReservationAsync(Guid restaurantId, Guid userId, string clientName, string date, string timeSlot);
     Task NotifyOrderChangeAsync(Guid restaurantId, Guid userId, string orderSummary, string status);
+    Task NotifyNewOrderAsync(Guid restaurantId, Guid userId, string orderCode, string summary);
 }
