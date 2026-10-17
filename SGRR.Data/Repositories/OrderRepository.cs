@@ -1,12 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using SGRR.Data.Context;
 using SGRR.Data.Interfaces;
 
 namespace SGRR.Data.Repositories;
 
 public class OrderRepository : IOrderRepository
 {
+    private readonly AppDbContext _context;
+
+    public OrderRepository(AppDbContext context)
+    {
+        _context = context;
+    }
+
     public Task<int> GetDailyTransactionsCountAsync()
     {
-        // Retornamos 0 temporalmente hasta que se desarrolle el RF05 (Órdenes)
-        return Task.FromResult(0);
+        var today = DateTime.Today;
+        var tomorrow = today.AddDays(1);
+
+        return _context.Orders.CountAsync(order =>
+            order.CreatedAt >= today && order.CreatedAt < tomorrow);
     }
 }

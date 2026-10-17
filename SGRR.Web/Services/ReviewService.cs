@@ -13,17 +13,20 @@ public class ReviewService : IReviewService
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IUserRepository _userRepository;
     private readonly IRestaurantReviewLock _reviewLock;
+    private readonly ISystemActivityLogRepository _logRepository;
 
     public ReviewService(
         IReviewRepository reviewRepository,
         IRestaurantRepository restaurantRepository,
         IUserRepository userRepository,
-        IRestaurantReviewLock reviewLock)
+        IRestaurantReviewLock reviewLock,
+        ISystemActivityLogRepository logRepository)
     {
         _reviewRepository = reviewRepository;
         _restaurantRepository = restaurantRepository;
         _userRepository = userRepository;
         _reviewLock = reviewLock;
+        _logRepository = logRepository;
     }
 
     public async Task<IEnumerable<ReviewDto>> GetByRestaurantAsync(
@@ -70,6 +73,10 @@ public class ReviewService : IReviewService
 
             await _reviewRepository.AddAsync(review);
             await RecalculateRestaurantRatingAsync(restaurant);
+            var customerName = $"{customer.Name} {customer.LastName}".Trim();
+            _logRepository.AddLog(
+                LogSeverity.Info,
+                $"El cliente '{(string.IsNullOrWhiteSpace(customerName) ? customer.Email : customerName)}' dejó una reseña de {review.Rating} estrellas para el restaurante '{restaurant.Name}'.");
             return ToDto(review);
         }
     }
@@ -82,7 +89,7 @@ public class ReviewService : IReviewService
 
         using (await _reviewLock.AcquireAsync(original.RestaurantId))
         {
-            GetActiveCustomer(customerId);
+            var customer = GetActiveCustomer(customerId);
             var review = await _reviewRepository.GetByIdAsync(reviewId)
                 ?? throw new KeyNotFoundException("Reseña no encontrada.");
             EnsureCustomerOwnsReview(review, customerId);
@@ -94,6 +101,10 @@ public class ReviewService : IReviewService
             var restaurant = await _restaurantRepository.GetByIdAsync(review.RestaurantId)
                 ?? throw new KeyNotFoundException("Restaurante no encontrado.");
             await RecalculateRestaurantRatingAsync(restaurant);
+            var customerName = $"{customer.Name} {customer.LastName}".Trim();
+            _logRepository.AddLog(
+                LogSeverity.Info,
+                $"El cliente '{(string.IsNullOrWhiteSpace(customerName) ? customer.Email : customerName)}' actualizó su reseña a {review.Rating} estrellas para el restaurante '{restaurant.Name}'.");
             return ToDto(review);
         }
     }
@@ -105,7 +116,7 @@ public class ReviewService : IReviewService
 
         using (await _reviewLock.AcquireAsync(original.RestaurantId))
         {
-            GetActiveCustomer(customerId);
+            var customer = GetActiveCustomer(customerId);
             var review = await _reviewRepository.GetByIdAsync(reviewId)
                 ?? throw new KeyNotFoundException("Reseña no encontrada.");
             EnsureCustomerOwnsReview(review, customerId);
@@ -114,6 +125,10 @@ public class ReviewService : IReviewService
             var restaurant = await _restaurantRepository.GetByIdAsync(review.RestaurantId)
                 ?? throw new KeyNotFoundException("Restaurante no encontrado.");
             await RecalculateRestaurantRatingAsync(restaurant);
+            var customerName = $"{customer.Name} {customer.LastName}".Trim();
+            _logRepository.AddLog(
+                LogSeverity.Info,
+                $"El cliente '{(string.IsNullOrWhiteSpace(customerName) ? customer.Email : customerName)}' eliminó su reseña para el restaurante '{restaurant.Name}'.");
         }
     }
 

@@ -34,22 +34,18 @@ public class PlatformMonitoringService : IPlatformMonitoringService
 
         var allUsers = _userRepository.GetAll().ToList();
         var allRestaurants = (await _restaurantRepository.GetAllAsync()).ToList();
+        var activeRestaurantCount = allRestaurants.Count(restaurant =>
+            _userRepository.GetOwnerByRestaurantId(restaurant.Id)?.IsActive == true);
 
-        // Agrupaciones y cálculos
-        var dto = new PlatformDashboardDto
+        return new PlatformDashboardDto
         {
+            TotalAdministrators = allUsers.Count(user => user.Role == Roles.Administrator),
             TotalClients = allUsers.Count(u => u.Role == Roles.Client),
-            TotalPropietaries = allUsers.Count(u => u.Role == Roles.Propietary),
-            
-            // Asumiendo que un restaurante hereda el estado de su usuario propietario o tiene su propio IsActive
-            // Para este ejemplo, evaluamos si el dueño está activo (Ajustar según tu lógica de dominio).
-            ActiveRestaurants = allUsers.Count(u => u.Role == Roles.Propietary && u.IsActive),
-            InactiveRestaurants = allUsers.Count(u => u.Role == Roles.Propietary && !u.IsActive),
-            
+            TotalProprietaries = allUsers.Count(user => user.Role == Roles.Propietary),
+            ActiveRestaurants = activeRestaurantCount,
+            InactiveRestaurants = allRestaurants.Count - activeRestaurantCount,
             DailyTransactions = await _orderRepository.GetDailyTransactionsCountAsync(),
             RecentLogs = _logRepository.GetLast100Logs()
         };
-
-        return dto;
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGRR.Data.Common.Enums;
 using SGRR.Data.Entities;
@@ -6,6 +7,7 @@ using SGRR.Web.Interfaces;
 
 namespace SGRR.Web.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class MonitoringController : Controller
 {
     private readonly IPlatformMonitoringService _monitoringService;

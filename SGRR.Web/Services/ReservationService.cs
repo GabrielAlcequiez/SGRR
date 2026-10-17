@@ -18,14 +18,16 @@ public class ReservationService : IReservationService
     private readonly IRestaurantRepository _restaurants;
     private readonly IMenuRepository _menus;
     private readonly IUserRepository _users;
+    private readonly ISystemActivityLogRepository _logRepository;
 
     public ReservationService(IReservationRepository reservations, IRestaurantRepository restaurants,
-        IMenuRepository menus, IUserRepository users)
+        IMenuRepository menus, IUserRepository users, ISystemActivityLogRepository logRepository)
     {
         _reservations = reservations;
         _restaurants = restaurants;
         _menus = menus;
         _users = users;
+        _logRepository = logRepository;
     }
 
     public async Task<bool> ValidateAvailabilityAsync(Guid restaurantId, DateTime date, string timeSlot, int peopleCount)
@@ -63,7 +65,15 @@ public class ReservationService : IReservationService
                 Date = model.Date.Date, TimeSlot = model.TimeSlot, PeopleCount = model.PeopleCount,
                 TableLocation = model.TableLocation, ReservationCode = $"RES-{id:N}", Status = "Active"
             };
-            return await _reservations.CreateAsync(reservation) ? reservation.ReservationCode : string.Empty;
+            if (!await _reservations.CreateAsync(reservation))
+                return string.Empty;
+
+            var restaurant = await _restaurants.GetByIdAsync(model.RestaurantId);
+            var clientName = $"{client.Name} {client.LastName}".Trim();
+            _logRepository.AddLog(
+                LogSeverity.Info,
+                $"Nueva reserva creada por el cliente '{(string.IsNullOrWhiteSpace(clientName) ? client.Email : clientName)}' en el restaurante '{restaurant?.Name ?? "Desconocido"}'.");
+            return reservation.ReservationCode;
         }
         finally { ReservationLock.Release(); }
     }
@@ -80,7 +90,15 @@ public class ReservationService : IReservationService
             if (reservation is null || reservation.ClientId != clientId || reservation.Status != "Active")
                 return false;
             reservation.Status = "Canceled";
-            return await _reservations.UpdateAsync(reservation);
+            if (!await _reservations.UpdateAsync(reservation))
+                return false;
+
+            var restaurant = await _restaurants.GetByIdAsync(reservation.RestaurantId);
+            var clientName = $"{client.Name} {client.LastName}".Trim();
+            _logRepository.AddLog(
+                LogSeverity.Warning,
+                $"La reserva {reservation.ReservationCode} del cliente '{(string.IsNullOrWhiteSpace(clientName) ? client.Email : clientName)}' en el restaurante '{restaurant?.Name ?? "Desconocido"}' cambió a estado '{reservation.Status}'.");
+            return true;
         }
         finally { ReservationLock.Release(); }
     }

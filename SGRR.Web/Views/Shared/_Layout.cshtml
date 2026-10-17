@@ -39,6 +39,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-primary fw-semibold" asp-controller="Category" asp-action="Index">Categorías</a>
                         </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-primary fw-semibold" asp-area="" asp-controller="Monitoring" asp-action="Index">Panel de Monitoreo</a>
+                            </li>
+                        }
                     }
                     else if (role == "Propietary")
                     {

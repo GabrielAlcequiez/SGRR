@@ -10,13 +10,15 @@ namespace SGRR.Web.Services;
 public class MenuService : IMenuService
 {
     private readonly IMenuRepository _menuRepository;
+    private readonly ISystemActivityLogRepository _logRepository;
 
     // Categoría por defecto cuando el propietario no especifica una
     private const string DefaultCategory = "Otros";
 
-    public MenuService(IMenuRepository menuRepository)
+    public MenuService(IMenuRepository menuRepository, ISystemActivityLogRepository logRepository)
     {
         _menuRepository = menuRepository;
+        _logRepository = logRepository;
     }
 
     public async Task<RestaurantMenuViewModel> GetMenuAndSchedulesAsync(Guid restaurantId, DateTime selectedDate)
@@ -89,6 +91,10 @@ public class MenuService : IMenuService
             dto.ImageUrl ?? string.Empty);
 
         await _menuRepository.AddAsync(item);
+        var ownerName = $"{requestor.Name} {requestor.LastName}".Trim();
+        _logRepository.AddLog(
+            LogSeverity.Info,
+            $"El propietario '{ownerName}' agregó el plato '{item.Name}' en el menú de '{requestor.Restaurant?.Name ?? "Desconocido"}'.");
         return item;
     }
 
@@ -102,6 +108,10 @@ public class MenuService : IMenuService
 
         item.UpdateDetails(name, dto.Description ?? string.Empty, dto.Price, category, dto.ImageUrl ?? string.Empty);
         await _menuRepository.UpdateAsync(item);
+        var ownerName = $"{requestor.Name} {requestor.LastName}".Trim();
+        _logRepository.AddLog(
+            LogSeverity.Info,
+            $"El propietario '{ownerName}' actualizó el plato '{item.Name}' en el menú de '{requestor.Restaurant?.Name ?? "Desconocido"}'.");
     }
 
     public async Task DeleteAsync(Guid id, User requestor)
@@ -109,6 +119,10 @@ public class MenuService : IMenuService
         var item = await GetByIdAsync(id, requestor)
             ?? throw new KeyNotFoundException("Plato no encontrado.");
         await _menuRepository.DeleteAsync(item.Id);
+        var ownerName = $"{requestor.Name} {requestor.LastName}".Trim();
+        _logRepository.AddLog(
+            LogSeverity.Info,
+            $"El propietario '{ownerName}' eliminó el plato '{item.Name}' del menú de '{requestor.Restaurant?.Name ?? "Desconocido"}'.");
     }
 
     private static Guid GetOwnerRestaurantId(User requestor)
