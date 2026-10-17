@@ -62,12 +62,14 @@ public static class DbInitializer
         context.SaveChanges();
 
         //Platos vinculados al ID que se acaba de generar
-        context.MenuItems.AddRange(
+        var seededMenuItems = new List<MenuItem>
+        {
             new MenuItem("Mangú con los Tres Golpes", "Mangú sedoso acompañado de queso frito, salami dominicano y huevo.", 350.00m, "Platos Fuertes", restaurant.Id, "https://picsum.photos"),
             new MenuItem("Mofongo de Chicharrón", "Plátano verde majado con ajo y chicharrón crujiente.", 450.00m, "Platos Fuertes", restaurant.Id, "https://picsum.photos"),
             new MenuItem("Yaroa de Pollo", "Capa de papas fritas con pollo desmechado, mucho queso y salsas.", 300.00m, "Entradas", restaurant.Id, "https://picsum.photos"),
             new MenuItem("Jugo de Morir Soñando", "Tradicional combinación de leche evoporada, naranja y hielo.", 150.00m, "Bebidas", restaurant.Id, "https://picsum.photos")
-        );
+        };
+        context.MenuItems.AddRange(seededMenuItems);
 
         // Horarios semanales de atención
         for (int i = 0; i < 7; i++)
@@ -124,6 +126,60 @@ public static class DbInitializer
         }).ToList();
 
         context.Reservations.AddRange(seededReservations);
+
+        // Órdenes anticipadas de prueba (RF05) con estados y modalidades mezclados
+        var year = DateTime.Now.Year;
+        var ahora = DateTime.Now;
+
+        OrdenAnticipada CrearOrden(int correlativo, string estado, string tipoEntrega,
+            DateTime fechaProgramada, TimeSpan horaProgramada, DateTime fechaOrden,
+            params (MenuItem Item, int Cantidad)[] productos)
+        {
+            var orden = new OrdenAnticipada
+            {
+                ClientId = client.Id,
+                RestaurantId = restaurant.Id,
+                PurchaseCode = $"ORD-{year}-{correlativo:D4}",
+                FechaOrden = fechaOrden,
+                FechaProgramada = fechaProgramada,
+                HoraProgramada = horaProgramada,
+                TipoEntrega = tipoEntrega,
+                Estado = estado
+            };
+
+            foreach (var (item, cantidad) in productos)
+            {
+                orden.Productos.Add(new OrdenProducto
+                {
+                    OrdenAnticipadaId = orden.Id,
+                    MenuItemId = item.Id,
+                    NombreProducto = item.Name,
+                    PrecioUnitario = item.Price,
+                    Cantidad = cantidad,
+                    Subtotal = item.Price * cantidad
+                });
+            }
+
+            orden.Total = orden.Productos.Sum(producto => producto.Subtotal);
+            return orden;
+        }
+
+        var seededOrdenesAnticipadas = new List<OrdenAnticipada>
+        {
+            CrearOrden(1, "Pendiente", "Recoger", DateTime.Today.AddDays(1), new TimeSpan(13, 0, 0), ahora.AddHours(-1),
+                (seededMenuItems[0], 2), (seededMenuItems[3], 1)),
+            CrearOrden(2, "Aceptada", "Delivery", DateTime.Today.AddDays(1), new TimeSpan(18, 30, 0), ahora.AddHours(-3),
+                (seededMenuItems[1], 1), (seededMenuItems[2], 1)),
+            CrearOrden(3, "Pendiente", "Recoger", DateTime.Today.AddDays(2), new TimeSpan(19, 0, 0), ahora.AddHours(-5),
+                (seededMenuItems[2], 3)),
+            CrearOrden(4, "Aceptada", "Recoger", DateTime.Today.AddDays(2), new TimeSpan(12, 30, 0), ahora.AddHours(-26),
+                (seededMenuItems[0], 1), (seededMenuItems[1], 1))
+        };
+
+        seededOrdenesAnticipadas[1].DireccionEntrega = "Av. Las Américas #12, Santo Domingo Este";
+        seededOrdenesAnticipadas[3].Notas = "Empacar aparte el queso frito.";
+
+        context.OrdenesAnticipadas.AddRange(seededOrdenesAnticipadas);
 
         context.SaveChanges();
     }

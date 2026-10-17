@@ -8,5 +8,6 @@ public interface IUserRepository
     void Update(User user);
     IEnumerable<User> GetAll();
     User? GetById(Guid id);
+    User? GetOwnerByRestaurantId(Guid restaurantId);
     bool ExistsByEmail(string email);
 }

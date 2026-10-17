@@ -73,4 +73,19 @@ public class OwnerNotificationService : IOwnerNotificationService
 
         await _notificationRepository.AddAsync(notification);
     }
+
+    public async Task NotifyNewOrderAsync(Guid restaurantId, Guid userId, string orderCode, string summary)
+    {
+        var notification = new Notification
+        {
+            RestaurantId = restaurantId,
+            UserId = userId,
+            Title = "Nueva Orden Anticipada",
+            Message = $"Se registró la orden {orderCode}: {summary}.",
+            Type = "Order",
+            CreatedAt = DateTime.Now
+        };
+
+        await _notificationRepository.AddAsync(notification);
+    }
 }
