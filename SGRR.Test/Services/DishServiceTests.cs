@@ -26,7 +26,9 @@ public class MenuOwnerServiceTests : IDisposable
         _otherOwner.SetRestaurant(new Restaurant { Name = "Restaurante B" });
         _context.Users.AddRange(_owner, _otherOwner);
         _context.SaveChanges();
-        _service = new MenuService(new MenuRepository(_context));
+        _service = new MenuService(
+            new MenuRepository(_context),
+            new CircularActivityLogRepository());
     }
 
     [Fact]

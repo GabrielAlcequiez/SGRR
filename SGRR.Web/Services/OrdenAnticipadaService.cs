@@ -21,6 +21,7 @@ public class OrdenAnticipadaService : IOrdenAnticipadaService
     private readonly IUserRepository _users;
     private readonly IOwnerNotificationService _ownerNotifications;
     private readonly INotificacionRepository _clientNotifications;
+    private readonly ISystemActivityLogRepository _logRepository;
 
     public OrdenAnticipadaService(
         IOrdenAnticipadaRepository ordenes,
@@ -28,7 +29,8 @@ public class OrdenAnticipadaService : IOrdenAnticipadaService
         IMenuRepository menus,
         IUserRepository users,
         IOwnerNotificationService ownerNotifications,
-        INotificacionRepository clientNotifications)
+        INotificacionRepository clientNotifications,
+        ISystemActivityLogRepository logRepository)
     {
         _ordenes = ordenes;
         _restaurants = restaurants;
@@ -36,6 +38,7 @@ public class OrdenAnticipadaService : IOrdenAnticipadaService
         _users = users;
         _ownerNotifications = ownerNotifications;
         _clientNotifications = clientNotifications;
+        _logRepository = logRepository;
     }
 
     public async Task<string> CrearAsync(CreateOrdenAnticipadaDto dto, Guid clientId)
@@ -124,6 +127,10 @@ public class OrdenAnticipadaService : IOrdenAnticipadaService
         }
 
         await NotificarPropietarioAsync(orden);
+        var clientName = $"{client.Name} {client.LastName}".Trim();
+        _logRepository.AddLog(
+            LogSeverity.Info,
+            $"Nueva orden anticipada creada por el cliente '{(string.IsNullOrWhiteSpace(clientName) ? client.Email : clientName)}' para el restaurante '{restaurante.Name}'.");
         return orden.PurchaseCode;
     }
 
@@ -178,6 +185,12 @@ public class OrdenAnticipadaService : IOrdenAnticipadaService
             return false;
 
         await NotificarClienteAsync(orden, nuevoEstado);
+        var client = _users.GetById(orden.ClientId);
+        var restaurant = await _restaurants.GetByIdAsync(orden.RestaurantId);
+        var clientName = client is null ? "Desconocido" : $"{client.Name} {client.LastName}".Trim();
+        _logRepository.AddLog(
+            LogSeverity.Info,
+            $"La orden {orden.PurchaseCode} del cliente '{clientName}' en el restaurante '{restaurant?.Name ?? "Desconocido"}' fue actualizada a estado '{nuevoEstado}'.");
         return true;
     }
 

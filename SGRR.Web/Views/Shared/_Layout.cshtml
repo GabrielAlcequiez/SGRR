@@ -13,20 +13,20 @@
 <body>
     <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-4">
-        <div class="container">
-            <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">FoodBook</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                
-                <!-- ENLACES PRINCIPALES SEGÚN EL ROL -->
-                <ul class="navbar-nav flex-grow-1">
-                    @{
-                        var role = Context.Session.GetString("UserRole");
-                        var userName = Context.Session.GetString("UserName");
-                    }
+    <div class="container">
+        <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">FoodBook</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            
+            <!-- ENLACES PRINCIPALES SEGÚN EL ROL -->
+            <ul class="navbar-nav flex-grow-1">
+                @{
+                    var role = Context.Session.GetString("UserRole");
+                    var userName = Context.Session.GetString("UserName");
+                }
 
                     @if (role == "Administrator")
                     {
@@ -39,6 +39,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-primary fw-semibold" asp-controller="Category" asp-action="Index">Categorías</a>
                         </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-primary fw-semibold" asp-area="" asp-controller="Monitoring" asp-action="Index">Panel de Monitoreo</a>
+                            </li>
+                        }
                     }
                     else if (role == "Propietary")
                     {
@@ -99,7 +105,8 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 </header>
     <div class="container">
         <main role="main" class="pb-3">

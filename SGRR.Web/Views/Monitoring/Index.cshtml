@@ -1,0 +1,124 @@
+@model SGRR.Web.Models.Monitoring.PlatformDashboardDto
+@{
+    ViewData["Title"] = "Monitoreo de Plataforma";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">📈 Salud Operativa de la Plataforma</h2>
+
+    <!-- Widgets -->
+    <div class="row text-center mb-5">
+        <div class="col-md">
+            <div class="card text-white bg-dark mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Administradores</h5>
+                    <h2 class="display-6 fw-bold">@Model.TotalAdministrators</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Clientes Registrados</h5>
+                    <h2 class="display-6 fw-bold">@Model.TotalClients</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-white bg-info mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Propietarios</h5>
+                    <h2 class="display-6 fw-bold">@Model.TotalProprietaries</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Restaurantes Activos</h5>
+                    <h2 class="display-6 fw-bold">@Model.ActiveRestaurants</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-white bg-secondary mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Restaurantes Inactivos</h5>
+                    <h2 class="display-6 fw-bold">@Model.InactiveRestaurants</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card text-dark bg-info mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Transacciones del Día</h5>
+                    <h2 class="display-6 fw-bold">@Model.DailyTransactions</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>📋 Últimos 100 Eventos del Sistema</h4>
+        <input type="text" id="logSearch" class="form-control w-25" placeholder="🔍 Buscar eventos...">
+    </div>
+
+    <!-- Tabla Circular de Logs -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0" id="logsTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 20%;">Fecha y Hora (UTC)</th>
+                        <th style="width: 15%;">Severidad</th>
+                        <th>Detalle del Evento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.RecentLogs.Any())
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center p-3">No hay registros recientes de auditoría.</td>
+                        </tr>
+                    }
+                    @foreach (var log in Model.RecentLogs)
+                    {
+                        <tr>
+                            <td class="text-muted">@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>
+                                @switch (log.Severity)
+                                {
+                                    case SGRR.Data.Common.Enums.LogSeverity.Info:
+                                        <span class="badge bg-primary w-100">Info</span>
+                                        break;
+                                    case SGRR.Data.Common.Enums.LogSeverity.Warning:
+                                        <span class="badge bg-warning text-dark w-100">Warning</span>
+                                        break;
+                                    case SGRR.Data.Common.Enums.LogSeverity.Error:
+                                        <span class="badge bg-danger w-100">Error</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="log-message">@log.Message</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const logSearch = document.getElementById("logSearch");
+    const logRows = document.querySelectorAll("#logsTable tbody tr");
+
+    logSearch.addEventListener("input", () => {
+        const query = logSearch.value.trim().toLocaleLowerCase();
+
+        for (const row of logRows) {
+            const message = row.querySelector(".log-message")?.textContent ?? "";
+            row.style.display = message.toLocaleLowerCase().includes(query) ? "" : "none";
+        }
+    });
+</script>

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Localization;
 using SGRR.Data.Context;
 using SGRR.Data.Interfaces;
@@ -10,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication("SessionAdmin")
+    .AddScheme<AuthenticationSchemeOptions, SessionAdminAuthenticationHandler>("SessionAdmin", _ => { });
+builder.Services.AddAuthorization();
 
 // Los navegadores envian los valores de <input type="number"> y <input type="date"> siempre con
 // formato invariante (punto decimal, fechas yyyy-MM-dd). Configuramos RequestLocalization para
@@ -56,6 +60,9 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IOwnerMetricsService, OwnerMetricsService>();
 builder.Services.AddScoped<IAdminReportService, AdminReportService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
+builder.Services.AddSingleton<SGRR.Data.Interfaces.ISystemActivityLogRepository, SGRR.Data.Repositories.CircularActivityLogRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPlatformMonitoringService, PlatformMonitoringService>();
 
 var app = builder.Build();
 
@@ -71,6 +78,7 @@ app.UseHttpsRedirection();
 app.UseRequestLocalization();
 app.UseRouting();
 app.UseSession();
+app.UseAuthentication();
 
 app.UseAuthorization();
 
