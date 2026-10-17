@@ -1,4 +1,4 @@
-@model IEnumerable<SGRR.Data.Entities.Dish>
+@model IEnumerable<SGRR.Data.Entities.MenuItem>
 @{
     ViewData["Title"] = "Mi menú";
 }
@@ -22,7 +22,7 @@ else
     <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead>
-                <tr><th>Nombre</th><th>Precio</th><th>Descripción</th><th>Acciones</th></tr>
+                <tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Descripción</th><th>Acciones</th></tr>
             </thead>
             <tbody>
                 @foreach (var dish in Model)
@@ -30,6 +30,7 @@ else
                     <tr>
                         <td class="text-break">@dish.Name</td>
                         <td>@dish.Price.ToString("N2")</td>
+                        <td><span class="badge bg-secondary">@dish.Category</span></td>
                         <td class="text-break">@dish.Description</td>
                         <td>
                             <div class="d-flex flex-wrap gap-2">

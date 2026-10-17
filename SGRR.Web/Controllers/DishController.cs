@@ -6,14 +6,15 @@ using SGRR.Web.Models.Dish;
 
 namespace SGRR.Web.Controllers;
 
+// Gestión del menú del propietario sobre MenuItems (la misma fuente de datos que ve el cliente)
 public class DishController : OwnerController
 {
-    private readonly IDishService _dishService;
+    private readonly IMenuService _menuService;
 
-    public DishController(IDishService dishService, IUserRepository userRepository)
+    public DishController(IMenuService menuService, IUserRepository userRepository)
         : base(userRepository)
     {
-        _dishService = dishService;
+        _menuService = menuService;
     }
 
     public override void OnActionExecuting(ActionExecutingContext context)
@@ -33,7 +34,7 @@ public class DishController : OwnerController
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        return View(await _dishService.GetByRestaurantIdAsync(CurrentOwner));
+        return View(await _menuService.GetByRestaurantIdForOwnerAsync(CurrentOwner));
     }
 
     [HttpGet]
@@ -48,7 +49,7 @@ public class DishController : OwnerController
 
         try
         {
-            await _dishService.CreateAsync(dto, CurrentOwner);
+            await _menuService.CreateAsync(dto, CurrentOwner);
             TempData["SuccessMessage"] = "Plato agregado correctamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -68,15 +69,17 @@ public class DishController : OwnerController
     {
         try
         {
-            var dish = await _dishService.GetByIdAsync(id, CurrentOwner);
-            if (dish is null)
+            var item = await _menuService.GetByIdAsync(id, CurrentOwner);
+            if (item is null)
                 return NotFound();
             return View(new UpdateDishDto
             {
-                Id = dish.Id,
-                Name = dish.Name,
-                Price = dish.Price,
-                Description = dish.Description
+                Id = item.Id,
+                Name = item.Name,
+                Price = item.Price,
+                Description = item.Description,
+                Category = item.Category,
+                ImageUrl = item.ImageUrl
             });
         }
         catch (UnauthorizedAccessException)
@@ -92,12 +95,12 @@ public class DishController : OwnerController
         try
         {
             // Comprobar pertenencia incluso si el formulario contiene datos inválidos.
-            if (await _dishService.GetByIdAsync(dto.Id, CurrentOwner) is null)
+            if (await _menuService.GetByIdAsync(dto.Id, CurrentOwner) is null)
                 return NotFound();
             if (!ModelState.IsValid)
                 return View(dto);
 
-            await _dishService.UpdateAsync(dto, CurrentOwner);
+            await _menuService.UpdateAsync(dto, CurrentOwner);
             TempData["SuccessMessage"] = "Plato actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -122,7 +125,7 @@ public class DishController : OwnerController
     {
         try
         {
-            await _dishService.DeleteAsync(id, CurrentOwner);
+            await _menuService.DeleteAsync(id, CurrentOwner);
             TempData["SuccessMessage"] = "Plato eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }

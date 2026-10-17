@@ -55,4 +55,23 @@ public class MenuItem
             throw new ArgumentException("El nuevo precio debe ser mayor a cero.", nameof(newPrice));
         Price = newPrice;
     }
+
+    // Actualiza los datos editables del platillo manteniendo las mismas validaciones del constructor
+    public void UpdateDetails(string name, string description, decimal price, string category, string imageUrl = "")
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("El nombre del platillo es requerido.", nameof(name));
+
+        if (price <= 0)
+            throw new ArgumentException("El precio debe ser mayor a cero.", nameof(price));
+
+        if (string.IsNullOrWhiteSpace(category))
+            throw new ArgumentException("La categoría es requerida.", nameof(category));
+
+        Name = name.Trim();
+        Description = description?.Trim() ?? string.Empty;
+        Price = price;
+        Category = category.Trim();
+        ImageUrl = imageUrl?.Trim() ?? string.Empty;
+    }
 }

@@ -82,8 +82,10 @@ namespace SGRR.Data.Repositories
                 foreach (var owner in owners)
                     owner.ClearRestaurant();
 
-                var dishes = await _context.Dishes.Where(dish => dish.RestaurantId == id).ToListAsync();
-                _context.Dishes.RemoveRange(dishes);
+                var menuItems = await _context.MenuItems.Where(item => item.RestaurantId == id).ToListAsync();
+                _context.MenuItems.RemoveRange(menuItems);
+                var schedules = await _context.RestaurantSchedules.Where(schedule => schedule.RestaurantId == id).ToListAsync();
+                _context.RestaurantSchedules.RemoveRange(schedules);
                 var reviews = await _context.Reviews.Where(review => review.RestaurantId == id).ToListAsync();
                 _context.Reviews.RemoveRange(reviews);
                 _context.Restaurants.Remove(restaurant);
