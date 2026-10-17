@@ -1,0 +1,76 @@
+@model SGRR.Web.Models.CreateReservationViewModel
+
+@{
+    ViewData["Title"] = "Realizar Reserva";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow border-0 rounded-3 bg-white">
+        <div class="card-header bg-success text-white py-3 text-center rounded-top">
+            <h3 class="m-0 fw-bold">Reservar en @Model.RestaurantName</h3>
+            <p class="mb-0 small opacity-75">Selecciona los detalles de tu mesa y horario</p>
+        </div>
+
+        <div class="card-body p-4">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger border-start border-4 border-danger shadow-sm" role="alert">
+                    System Alert: @Model.ErrorMessage
+                </div>
+            }
+
+            <form asp-controller="Reservation" asp-action="ConfirmSummary" method="post"><div asp-validation-summary="All" class="text-danger"></div>
+                <input type="hidden" asp-for="RestaurantId" />
+                <input type="hidden" asp-for="RestaurantName" />
+
+                <div class="mb-3">
+                    <label asp-for="Date" class="form-label fw-semibold text-secondary">1. Seleccionar Fecha:</label>
+                    <input asp-for="Date" type="date" class="form-control form-control-lg border-2"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    <span asp-validation-for="Date" class="text-danger small"></span>
+                    <button type="submit" class="btn btn-outline-secondary mt-2" formaction="@Url.Action("RefreshHours", "Reservation")" formnovalidate>Consultar horarios de esta fecha</button>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PeopleCount" class="form-label fw-semibold text-secondary">2. Cantidad de asistentes:</label>
+                    <input asp-for="PeopleCount" type="number" class="form-control form-control-lg border-2"
+                           min="1" max="20" placeholder="Ej: 4" required />
+                    <span asp-validation-for="PeopleCount" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TableLocation" class="form-label fw-semibold text-secondary">3. Ubicación de la Mesa:</label>
+                    <select asp-for="TableLocation" class="form-select form-select-lg border-2" required>
+                        <option value="">-- Elige un área del restaurant --</option>
+                        <option value="Salón Principal">Salón Principal (Acondicionado)</option>
+                        <option value="Terraza">Terraza al Aire Libre</option>
+                        <option value="VIP">Zona VIP (Privado)</option>
+                        <option value="Barra">Área de la Barra</option>
+                    </select>
+                    <span asp-validation-for="TableLocation" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    @if (ViewBag.HoursUpdated == true)
+                    {
+                        <p class="text-success" role="status">Horarios actualizados para el @Model.Date.ToString("dd/MM/yyyy") según la cantidad de asistentes indicada.</p>
+                    }
+                    <label asp-for="TimeSlot" class="form-label fw-semibold text-secondary">4. Bloque de Horario:</label>
+                    <select asp-for="TimeSlot" class="form-select form-select-lg border-2" required>
+                        <option value="">-- Seleccionar hora disponible --</option>
+                        @foreach (var hour in (List<string>)ViewBag.AvailableHours) { <option value="@hour">@hour</option> }
+                    </select>
+                    <span asp-validation-for="TimeSlot" class="text-danger small"></span>
+                    @if (((List<string>)ViewBag.AvailableHours).Count == 0)
+                    {
+                        <p class="text-warning">No hay horarios disponibles. Seleccione otra fecha y consulte sus horarios.</p>
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg w-100 shadow fw-bold py-3 text-uppercase">
+                    Revisar Reserva
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

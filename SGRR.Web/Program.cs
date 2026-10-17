@@ -1,3 +1,5 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 using SGRR.Data.Context;
 using SGRR.Data.Interfaces;
 using SGRR.Data.Repositories;
@@ -8,6 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Los navegadores envian los valores de <input type="number"> y <input type="date"> siempre con
+// formato invariante (punto decimal, fechas yyyy-MM-dd). Configuramos RequestLocalization para
+// que el servidor los interprete con cultura invariante y no los mezcle con la cultura local
+// (es-DO usa coma decimal: "180.00" se parseaba como 18000).
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var localUICulture = new CultureInfo("es-DO");
+    options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture, localUICulture);
+    options.SupportedCultures = [CultureInfo.InvariantCulture];
+    options.SupportedUICultures = [localUICulture];
+});
 builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -19,10 +33,12 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
-builder.Services.AddScoped<IDishRepository, DishRepository>();
-builder.Services.AddScoped<IDishService, DishService>();
+builder.Services.AddScoped<IRestaurantSearchService, RestaurantSearchService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddSingleton<IRestaurantReviewLock, RestaurantReviewLock>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddSingleton<ICategoryRepository, InMemoryCategoryRepository>();
 builder.Services.AddSingleton<INotificacionRepository, NotificacionRepository>();
@@ -30,10 +46,15 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
-builder.Services.AddSingleton<ISystemActivityLogRepository, CircularActivityLogRepository>();
-builder.Services.AddScoped<IPlatformMonitoringService, PlatformMonitoringService>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-
+builder.Services.AddScoped<SGRR.Data.Interfaces.IReservationRepository, SGRR.Data.Repositories.ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddSingleton<IOrdenesAnticipadasRepository, OrdenesAnticipadasRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IOwnerNotificationService, OwnerNotificationService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IOwnerMetricsService, OwnerMetricsService>();
+builder.Services.AddScoped<IAdminReportService, AdminReportService>();
+builder.Services.AddScoped<IReportExportService, ReportExportService>();
 
 var app = builder.Build();
 
@@ -46,6 +67,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization();
 app.UseRouting();
 app.UseSession();
 

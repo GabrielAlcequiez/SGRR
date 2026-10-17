@@ -1,0 +1,39 @@
+@model SGRR.Web.Models.EditReviewViewModel
+@{
+    ViewData["Title"] = "Editar reseña";
+}
+
+<div class="mx-auto" style="max-width: 700px;">
+    <a asp-action="Index" asp-route-restaurantId="@Model.RestaurantId" class="text-decoration-none">&larr; Volver a las reseñas</a>
+    <h1 class="h2 mt-3">Editar reseña de @Model.RestaurantName</h1>
+
+    <form asp-action="Edit" asp-route-reviewId="@Model.ReviewId" method="post" class="card card-body mt-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+        <fieldset class="mb-3">
+            <legend class="form-label fs-6">Tu puntuación</legend>
+            <div class="star-picker" role="radiogroup" aria-label="Selecciona de 1 a 5 estrellas">
+                @for (var star = 5; star >= 1; star--)
+                {
+                    <input asp-for="Rating" type="radio" id="edit-rating-@star" value="@star" />
+                    <label for="edit-rating-@star" title="@star estrella(s)">★</label>
+                }
+            </div>
+            <span asp-validation-for="Rating" class="text-danger small d-block"></span>
+        </fieldset>
+
+        <div class="mb-3">
+            <label asp-for="Comment" class="form-label">Comentario</label>
+            <textarea asp-for="Comment" class="form-control" rows="5" maxlength="1000"></textarea>
+            <span asp-validation-for="Comment" class="text-danger small"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <a asp-action="Index" asp-route-restaurantId="@Model.RestaurantId" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

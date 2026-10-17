@@ -101,13 +101,13 @@ public class RestaurantServiceTests : IDisposable
     public async Task DeleteAsync_EliminaPlatosYPermiteCrearNuevoPerfil()
     {
         var restaurant = await _service.CreateAsync(ValidProfile(), _owner);
-        _context.Dishes.Add(new Dish { RestaurantId = restaurant.Id, Name = "Pizza", Price = 100 });
+        _context.MenuItems.Add(new MenuItem("Pizza", "Pizza de queso", 100, "Platos Fuertes", restaurant.Id));
         await _context.SaveChangesAsync();
         await _service.DeleteAsync(restaurant.Id, _owner);
         using var nextRequest = new AppDbContext(_options);
         var owner = new UserRepository(nextRequest).GetById(_owner.Id);
         Assert.Null(owner!.Restaurant);
-        Assert.Empty(nextRequest.Dishes);
+        Assert.Empty(nextRequest.MenuItems);
         Assert.Empty(await _service.GetAllAsync());
         await _service.CreateAsync(ValidProfile(), _owner);
     }

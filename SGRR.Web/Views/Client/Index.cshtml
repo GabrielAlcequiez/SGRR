@@ -1,26 +1,39 @@
-@model IEnumerable<SGRR.Data.Entities.Restaurant>
+@model SGRR.Web.Models.RestaurantSearchViewModel
 @{
     ViewData["Title"] = "Buscar restaurantes";
 }
 
 <h1 class="h2 mb-4">Buscar restaurantes</h1>
 <form asp-action="Index" method="get" class="mb-4">
-    <label for="search" class="form-label">Nombre, especialidad o ubicación</label>
-    <div class="d-flex flex-wrap gap-2">
-        <input id="search" name="search" value="@ViewBag.Search" class="form-control flex-grow-1 w-auto" placeholder="Buscar restaurantes" />
-        <button class="btn btn-primary" type="submit">Buscar</button>
-        <a class="btn btn-outline-secondary" asp-action="Index">Limpiar</a>
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label asp-for="Specialty" class="form-label">Especialidad</label>
+            <input asp-for="Specialty" class="form-control" placeholder="Ej. comida criolla" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Location" class="form-label">Ubicación</label>
+            <input asp-for="Location" class="form-control" placeholder="Ej. Santo Domingo" />
+        </div>
+        <div class="col-md-2">
+            <label asp-for="MinimumRating" class="form-label">Evaluación mínima</label>
+            <input asp-for="MinimumRating" class="form-control" type="number" min="1" max="5" step="0.1" placeholder="1–5" />
+            <span asp-validation-for="MinimumRating" class="text-danger small"></span>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Limpiar</a>
+        </div>
     </div>
 </form>
 
-@if (!Model.Any())
+@if (ViewData.ModelState.IsValid && !Model.Results.Any())
 {
     <div class="alert alert-info" role="status">No se encontraron restaurantes</div>
 }
-else
+else if (ViewData.ModelState.IsValid)
 {
     <div class="row g-3">
-        @foreach (var restaurant in Model)
+        @foreach (var restaurant in Model.Results)
         {
             <div class="col-md-6">
                 <article class="card h-100">
@@ -28,13 +41,19 @@ else
                         <h2 class="h5 text-break">@restaurant.Name</h2>
                         <p class="mb-1 text-break"><strong>Especialidad:</strong> @restaurant.Specialty</p>
                         <p class="mb-2 text-break"><strong>Ubicación:</strong> @restaurant.Location</p>
+                        <p class="mb-2"><strong>Evaluación:</strong> @(restaurant.Rating.HasValue ? restaurant.Rating.Value.ToString("0.0") : "Sin evaluación") (@restaurant.ReviewCount reseña(s))</p>
                         @if (!string.IsNullOrWhiteSpace(restaurant.Description))
                         {
                             <p class="card-text text-break">@restaurant.Description</p>
                         }
+                        <a asp-controller="RestaurantMenu" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-primary btn-sm mt-2">Ver menú y reservar</a><a asp-controller="Review" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-outline-primary btn-sm mt-2">Ver reseñas y opinar</a>
                     </div>
                 </article>
             </div>
         }
     </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

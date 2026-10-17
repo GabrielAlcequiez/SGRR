@@ -1,0 +1,46 @@
+@model IEnumerable<SGRR.Web.Models.Owner.OwnerNotificationViewModel>
+
+@{
+    ViewData["Title"] = "Notificaciones de Órdenes y Reservas";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-bell-fill"></i> Panel de Notificaciones</h2>
+    <p class="text-muted">Supervisa las alertas recientes de reservas y órdenes de tu restaurante.</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mt-3" role="alert">
+            No tienes notificaciones registradas por el momento.
+        </div>
+    }
+    else
+    {
+        <div class="list-group mt-3">
+            @foreach (var notification in Model)
+            {
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @notification.RowStatusClass">
+                    <div>
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@notification.Title</h5>
+                            <small class="text-muted">@notification.CreatedAtFormatted</small>
+                        </div>
+                        <p class="mb-1">@notification.Message</p>
+                        <span class="badge bg-@notification.TypeBadgeClass">@notification.Type</span>
+                    </div>
+                    
+                    @if (!notification.IsRead)
+                    {
+                        <form asp-action="MarkAsRead" asp-route-id="@notification.Id" method="post" class="ms-3">
+                            <button type="submit" class="btn btn-sm btn-outline-dark">Marcar como leída</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary ms-3">Leída</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
