@@ -57,9 +57,12 @@
                     else if (role == "Client")
                     {
                         <li class="nav-item">
-
-                                <a class="nav-link text-info fw-semibold" asp-controller="Reservation" asp-action="Index">Mis reservas</a>
-
+                            <a class="nav-link text-info fw-semibold" asp-controller="Reservation" asp-action="Index">Mis reservas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-info fw-semibold" asp-controller="OrdenesAnticipadas" asp-action="MisOrdenes">Mis órdenes</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-info fw-semibold" asp-controller="Client" asp-action="Index">Buscar restaurantes</a>
                         </li>
                         <li class="nav-item">
