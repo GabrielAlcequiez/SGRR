@@ -46,7 +46,7 @@ else if (ViewData.ModelState.IsValid)
                         {
                             <p class="card-text text-break">@restaurant.Description</p>
                         }
-                        <a asp-controller="RestaurantMenu" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-primary btn-sm mt-2">Ver menú y reservar</a><a asp-controller="Review" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-outline-primary btn-sm mt-2">Ver reseñas y opinar</a>
+                        <a asp-controller="RestaurantMenu" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-primary btn-sm mt-2">Ver menú y reservar</a><a asp-controller="OrdenesAnticipadas" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-outline-success btn-sm mt-2">Ordenar con anticipación</a><a asp-controller="Review" asp-action="Index" asp-route-restaurantId="@restaurant.Id" class="btn btn-outline-primary btn-sm mt-2">Ver reseñas y opinar</a>
                     </div>
                 </article>
             </div>

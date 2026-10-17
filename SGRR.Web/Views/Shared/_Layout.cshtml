@@ -49,6 +49,9 @@
                             <a class="nav-link text-success fw-semibold" asp-controller="Dish" asp-action="Index">Mi menú</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-success fw-semibold" asp-controller="OwnerOrders" asp-action="Index">Órdenes anticipadas</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-success fw-semibold" asp-controller="OwnerNotifications" asp-action="Index">
                                 <i class="bi bi-bell-fill"></i> Notificaciones
                             </a>
@@ -57,9 +60,12 @@
                     else if (role == "Client")
                     {
                         <li class="nav-item">
-
-                                <a class="nav-link text-info fw-semibold" asp-controller="Reservation" asp-action="Index">Mis reservas</a>
-
+                            <a class="nav-link text-info fw-semibold" asp-controller="Reservation" asp-action="Index">Mis reservas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-info fw-semibold" asp-controller="OrdenesAnticipadas" asp-action="MisOrdenes">Mis órdenes</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-info fw-semibold" asp-controller="Client" asp-action="Index">Buscar restaurantes</a>
                         </li>
                         <li class="nav-item">

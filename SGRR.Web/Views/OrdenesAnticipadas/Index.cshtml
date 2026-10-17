@@ -1,107 +1,185 @@
-﻿@{
-    ViewData["Title"] = "Órdenes Anticipadas";
+﻿@model SGRR.Web.Models.Ordenes.CreateOrdenAnticipadaDto
+@using System.Globalization
+@{
+    ViewData["Title"] = "Ordenar con anticipación";
+    var menu = (Dictionary<string, List<SGRR.Data.Entities.MenuItem>>)ViewBag.CategorizedMenu;
+    var horario = ViewBag.ScheduleText as string;
+    var horaMinima = (string)ViewBag.HoraMinima;
+
+    int CantidadSeleccionada(Guid menuItemId) =>
+        Model.Items?.FirstOrDefault(item => item.MenuItemId == menuItemId)?.Cantidad ?? 0;
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm p-4">
-        <h2 class="mb-4 text-primary">Realizar Orden Anticipada</h2>
+<h1 class="h2 mb-1">Ordenar con anticipación</h1>
+<p class="text-muted">@Model.RestaurantName</p>
 
-        <!-- Banner para mostrar errores o éxito (Criterio de Aceptación) -->
-        <div id="alertMessage" class="alert d-none" role="alert"></div>
-
-        <form id="formOrdenAnticipada" novalidate>
-            <!-- ID de Compra (Simulado) -->
-            <div class="mb-3">
-                <label class="form-label font-weight-bold">ID de Compra</label>
-                <input type="text" class="form-control" id="compraId" value="ORD-2026-001" readonly disabled>
-            </div>
-
-            <!-- Producto -->
-            <div class="mb-3">
-                <label for="producto" class="form-label">Producto *</label>
-                <select class="form-select form-control" id="producto">
-                    <option value="">-- Seleccione un producto --</option>
-                    <option value="1">Menú Ejecutivo</option>
-                    <option value="2">Plato del Día</option>
-                    <option value="3">Combo Especial</option>
-                </select>
-                <small class="text-danger d-none" id="errorProducto">Por favor seleccione un producto.</small>
-            </div>
-
-            <!-- Cantidad -->
-            <div class="mb-3">
-                <label for="cantidad" class="form-label">Cantidad *</label>
-                <input type="number" class="form-control" id="cantidad" min="1" value="1">
-                <small class="text-danger d-none" id="errorCantidad">La cantidad debe ser al menos 1.</small>
-            </div>
-
-            <!-- Fecha -->
-            <div class="mb-3">
-                <label for="fecha" class="form-label">Fecha de Recogida *</label>
-                <input type="date" class="form-control" id="fecha">
-                <small class="text-danger d-none" id="errorFecha">Seleccione una fecha válida.</small>
-            </div>
-
-            <!-- Hora -->
-            <div class="mb-3">
-                <label for="hora" class="form-label">Hora de Recogida *</label>
-                <input type="time" class="form-control" id="hora">
-                <small class="text-danger d-none" id="errorHora">Seleccione una hora válida.</small>
-            </div>
-
-            <div class="d-flex justify-content-between mt-4">
-                <button type="submit" class="btn btn-success px-4">Confirmar Orden</button>
-                <button type="reset" class="btn btn-secondary px-4">Limpiar</button>
-            </div>
-        </form>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger border-start border-4 border-danger shadow-sm" role="alert">
+        @Model.ErrorMessage
     </div>
-</div>
+}
+
+<form asp-action="Crear" method="post">
+    <input type="hidden" asp-for="RestaurantId" />
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <h2 class="h5 border-bottom pb-2">1. Elige tus productos</h2>
+            @if (menu.Count == 0)
+            {
+                <div class="alert alert-warning" role="alert">
+                    Este restaurante no tiene platillos disponibles en su menú en este momento.
+                </div>
+            }
+            else
+            {
+                var indice = 0;
+                foreach (var categoria in menu)
+                {
+                    <h3 class="h6 text-uppercase text-secondary mt-4">@categoria.Key</h3>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <tbody>
+                                @foreach (var item in categoria.Value)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold text-break">@item.Name</span>
+                                            <div class="text-muted small text-break">@item.Description</div>
+                                        </td>
+                                        <td class="text-nowrap">$@item.Price.ToString("N2")</td>
+                                        <td style="width: 110px;">
+                                            <input type="hidden" name="Items[@indice].MenuItemId" value="@item.Id" />
+                                            <input type="number" class="form-control cantidad-producto" name="Items[@indice].Cantidad"
+                                                   value="@CantidadSeleccionada(item.Id)" min="0" max="100"
+                                                   data-precio="@item.Price.ToString(CultureInfo.InvariantCulture)"
+                                                   aria-label="Cantidad de @item.Name" />
+                                        </td>
+                                    </tr>
+                                    indice++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-header bg-dark text-white fw-bold py-3">2. Programa tu orden</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="FechaProgramada" class="form-label fw-semibold">Fecha *</label>
+                        <input asp-for="FechaProgramada" type="date" class="form-control"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                        <span asp-validation-for="FechaProgramada" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HoraProgramada" class="form-label fw-semibold">Hora *</label>
+                        <input asp-for="HoraProgramada" type="time" class="form-control" min="@horaMinima" required />
+                        <span asp-validation-for="HoraProgramada" class="text-danger small"></span>
+                        @if (!string.IsNullOrEmpty(horario))
+                        {
+                            <div class="form-text">@horario</div>
+                        }
+                        else
+                        {
+                            <div class="form-text text-warning">El restaurante no atiende en la fecha seleccionada.</div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TipoEntrega" class="form-label fw-semibold">Tipo de entrega *</label>
+                        <select asp-for="TipoEntrega" class="form-select">
+                            <option value="Recoger">Recoger en el restaurante</option>
+                            <option value="Delivery">Delivery</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="bloqueDireccion">
+                        <label asp-for="DireccionEntrega" class="form-label fw-semibold">Dirección de entrega *</label>
+                        <input asp-for="DireccionEntrega" class="form-control" placeholder="Calle, número, referencia" />
+                        <span asp-validation-for="DireccionEntrega" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Notas" class="form-label fw-semibold">Notas (opcional)</label>
+                        <textarea asp-for="Notas" class="form-control" rows="2" placeholder="Ej. sin picante, empacar aparte..."></textarea>
+                        <span asp-validation-for="Notas" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <span class="fw-semibold">Total:</span>
+                        <span class="fs-4 fw-bold text-success">$<span id="totalOrden">0.00</span></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100 mt-3 shadow fw-bold" disabled="@(menu.Count == 0)">
+                        Confirmar orden
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
     <script>
-        document.getElementById('formOrdenAnticipada').addEventListener('submit', function(e) {
-            e.preventDefault();
+        (function () {
+            const cantidades = document.querySelectorAll('.cantidad-producto');
+            const totalTexto = document.getElementById('totalOrden');
+            const fecha = document.getElementById('FechaProgramada');
+            const hora = document.getElementById('HoraProgramada');
+            const tipoEntrega = document.getElementById('TipoEntrega');
+            const bloqueDireccion = document.getElementById('bloqueDireccion');
 
-            let isValid = true;
-            const producto = document.getElementById('producto').value;
-            const cantidad = parseInt(document.getElementById('cantidad').value);
-            const fecha = document.getElementById('fecha').value;
-            const hora = document.getElementById('hora').value;
-            const alertBox = document.getElementById('alertMessage');
-
-            // Limpiar errores
-            document.querySelectorAll('.text-danger').forEach(el => el.classList.add('d-none'));
-            alertBox.classList.add('d-none');
-
-            // Validaciones
-            if (!producto) {
-                document.getElementById('errorProducto').classList.remove('d-none');
-                isValid = false;
+            function actualizarTotal() {
+                let total = 0;
+                cantidades.forEach(function (input) {
+                    const cantidad = parseInt(input.value, 10) || 0;
+                    if (cantidad > 0) {
+                        total += cantidad * parseFloat(input.dataset.precio);
+                    }
+                });
+                totalTexto.textContent = total.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            if (isNaN(cantidad) || cantidad <= 0) {
-                document.getElementById('errorCantidad').classList.remove('d-none');
-                isValid = false;
+            function actualizarHoraMinima() {
+                if (!fecha.value) {
+                    return;
+                }
+                const hoy = new Date();
+                const yyyy = hoy.getFullYear();
+                const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+                const dd = String(hoy.getDate()).padStart(2, '0');
+                if (fecha.value === `${yyyy}-${mm}-${dd}`) {
+                    hoy.setMinutes(hoy.getMinutes() + 30);
+                    const hh = String(hoy.getHours()).padStart(2, '0');
+                    const min = String(hoy.getMinutes()).padStart(2, '0');
+                    hora.min = `${hh}:${min}`;
+                    if (hora.value && hora.value < hora.min) {
+                        hora.value = hora.min;
+                    }
+                } else {
+                    hora.min = '00:00';
+                }
             }
 
-            if (!fecha) {
-                document.getElementById('errorFecha').classList.remove('d-none');
-                isValid = false;
+            function actualizarDireccion() {
+                bloqueDireccion.classList.toggle('d-none', tipoEntrega.value !== 'Delivery');
             }
 
-            if (!hora) {
-                document.getElementById('errorHora').classList.remove('d-none');
-                isValid = false;
-            }
+            cantidades.forEach(function (input) {
+                input.addEventListener('input', actualizarTotal);
+            });
+            fecha.addEventListener('change', actualizarHoraMinima);
+            tipoEntrega.addEventListener('change', actualizarDireccion);
 
-            // Resultado según Criterio de Aceptación
-            if (!isValid) {
-                alertBox.className = "alert alert-danger d-block";
-                alertBox.textContent = "Error al ingresar los datos: Por favor verifique los campos señalados.";
-            } else {
-                alertBox.className = "alert alert-success d-block";
-                alertBox.textContent = "Orden anticipada procesada correctamente.";
-            }
-        });
+            actualizarTotal();
+            actualizarHoraMinima();
+            actualizarDireccion();
+        })();
     </script>
 }

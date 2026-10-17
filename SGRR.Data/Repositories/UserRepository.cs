@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SGRR.Data.Common.Enums;
 using SGRR.Data.Context;
 using SGRR.Data.Entities;
 using SGRR.Data.Interfaces;
@@ -57,6 +58,15 @@ public class UserRepository : IUserRepository
     public User? GetById(Guid id)
     {
         return _context.Users.Include(user => user.Restaurant).FirstOrDefault(user => user.Id == id);
+    }
+
+    public User? GetOwnerByRestaurantId(Guid restaurantId)
+    {
+        return _context.Users
+            .Include(user => user.Restaurant)
+            .FirstOrDefault(user => user.Role == Roles.Propietary
+                && user.Restaurant != null
+                && user.Restaurant.Id == restaurantId);
     }
 
     public bool ExistsByEmail(string email)

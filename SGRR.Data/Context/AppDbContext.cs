@@ -32,6 +32,12 @@ namespace SGRR.Data.Context
                 .WithMany()
                 .HasForeignKey(review => review.RestaurantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrdenAnticipada>()
+                .HasMany(orden => orden.Productos)
+                .WithOne()
+                .HasForeignKey(producto => producto.OrdenAnticipadaId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
         
         #region DbSets
@@ -45,6 +51,7 @@ namespace SGRR.Data.Context
 
         
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<OrdenAnticipada> OrdenesAnticipadas { get; set; }
 
 
         #endregion
