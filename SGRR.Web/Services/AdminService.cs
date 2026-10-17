@@ -8,10 +8,12 @@ namespace SGRR.Web.Services;
 public class AdminService : IAdminService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ISystemActivityLogRepository _logRepository;
 
-    public AdminService(IUserRepository userRepository)
+    public AdminService(IUserRepository userRepository, ISystemActivityLogRepository logRepository)
     {
         _userRepository = userRepository;
+        _logRepository = logRepository;
     }
 
     public IEnumerable<User> GetAllUsers(User requestor)
@@ -38,6 +40,9 @@ public class AdminService : IAdminService
 
         userToUpdate.SetActive(isActive);
         _userRepository.Update(userToUpdate);
+        _logRepository.AddLog(
+            LogSeverity.Warning,
+            $"El administrador cambió el estado del usuario '{userToUpdate.Email}' a {(isActive ? "Activo" : "Inactivo")}.");
     }
 
     private void ValidateAdminRole(User user)

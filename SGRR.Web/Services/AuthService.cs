@@ -10,15 +10,18 @@ public class AuthService : IAuthService
     private readonly IAuthRepository _authRepository;
     private readonly IUserRepository _userRepository;
     private readonly IRestaurantRepository _restaurantRepository;
+    private readonly ISystemActivityLogRepository _logRepository;
 
     public AuthService(
         IAuthRepository authRepository,
         IUserRepository userRepository,
-        IRestaurantRepository restaurantRepository)
+        IRestaurantRepository restaurantRepository,
+        ISystemActivityLogRepository logRepository)
     {
         _authRepository = authRepository;
         _userRepository = userRepository;
         _restaurantRepository = restaurantRepository;
+        _logRepository = logRepository;
     }
 
     public User Register(string name, string lastName, string email, string password, Roles role)
@@ -28,8 +31,13 @@ public class AuthService : IAuthService
             throw new InvalidOperationException($"El correo '{email}' ya se encuentra registrado.");
         }
 
-        return _authRepository.Register(name, lastName, email, password, role)
+        var user = _authRepository.Register(name, lastName, email, password, role)
             ?? throw new InvalidOperationException("No se pudo registrar el usuario.");
+
+        // Registrar evento de auditoría
+        _logRepository.AddLog(LogSeverity.Info, $"Nuevo usuario registrado: {email} (Rol: {role}).");
+
+        return user;
     }
 
     public async Task<User> RegisterProprietaryAsync(
@@ -67,18 +75,30 @@ public class AuthService : IAuthService
             Description = description?.Trim()
         };
 
-        return _authRepository.Register(name, lastName, email, password, Roles.Propietary, restaurant)
+        var user = _authRepository.Register(name, lastName, email, password, Roles.Propietary, restaurant)
             ?? throw new InvalidOperationException("No se pudo registrar el propietario.");
+
+        // Registrar evento de auditoría
+        _logRepository.AddLog(LogSeverity.Info, $"Nuevo propietario registrado: {email} con el restaurante '{restaurant.Name}'.");
+
+        return user;
     }
 
     public User? Login(string email, string password)
     {
         var user = _authRepository.Login(email, password);
         
-        if (user != null && !user.IsActive)
+        if (user != null)
         {
-            // Lanzamos una excepcion clara que podemos capturar en el Controlador y en el Test.
-            throw new UnauthorizedAccessException("Su cuenta ha sido bloqueada. Contacte al administrador.");
+            if (!user.IsActive)
+            {
+                // Registrar intento bloqueado
+                _logRepository.AddLog(LogSeverity.Warning, $"Intento de inicio de sesión denegado. La cuenta '{email}' está bloqueada.");
+                throw new UnauthorizedAccessException("Su cuenta ha sido bloqueada. Contacte al administrador.");
+            }
+
+            // Registrar inicio de sesión exitoso
+            _logRepository.AddLog(LogSeverity.Info, $"El usuario '{email}' inició sesión en el sistema.");
         }
 
         return user;
