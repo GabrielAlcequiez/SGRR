@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SGRR.Data.Common.Enums;
 using SGRR.Data.Context;
+using SGRR.Data.Entities;
 using SGRR.Web.Interfaces;
 using SGRR.Web.Models.Owner;
 
@@ -33,14 +34,13 @@ public class OwnerMetricsService : IOwnerMetricsService
 
         var orders = await ordersQuery.ToListAsync();
 
-        // Órdenes completadas (las rechazadas o canceladas no suman a ingresos ni ticket promedio)
-        var completedOrders = orders.Where(o => o.Status == "Completed" || o.Status == "Completada").ToList();
-        
-        decimal totalRevenue = completedOrders.Sum(o => o.TotalAmount);
-        int completedCount = completedOrders.Count;
-        
-        // Operación protegida para evitar división por cero
-        decimal averageTicket = completedCount > 0 ? totalRevenue / completedCount : 0.00m;
+        // Calcular métricas financieras
+        var (totalRevenue, averageTicket, completedCount) = Calculate(orders);
+
+        // Mantener las órdenes completadas para el gráfico de ingresos diarios
+        var completedOrders = orders
+            .Where(o => o.Status is "Completed" or "Completada")
+            .ToList();
 
         // 2. Consultar y filtrar reservas confirmadas
         var reservationsQuery = _context.Reservations
@@ -70,4 +70,24 @@ public class OwnerMetricsService : IOwnerMetricsService
             DailyRevenue = dailyRevenue
         };
     }
+
+    // Método creado por Gabriel para poder realizar las pruebas unitarias sin necesidad de volverlas
+    // de integración, sin esto no podría.
+
+    // Calcula los ingresos totales, ticket promedio y cantidad de ordenes completadas y rechazadas 
+
+    public static (decimal TotalRevenue, decimal AverageTicket, int CompletedCount)
+        Calculate(IEnumerable<Order> orders)
+    {
+        var completedOrders = orders
+            .Where(o => o.Status is "Completed" or "Completada")
+            .ToList();
+
+        decimal totalRevenue = completedOrders.Sum(o => o.TotalAmount);
+        int count = completedOrders.Count;
+        decimal averageTicket = count > 0 ? totalRevenue / count : 0.00m;
+
+        return (totalRevenue, averageTicket, count);
+    }
 }
+
