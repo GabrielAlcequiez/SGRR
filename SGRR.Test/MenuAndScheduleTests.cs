@@ -11,7 +11,7 @@ namespace SGRR.Test
 {
     public class MenuAndScheduleTests
     {
-        // Usamos los mocks adaptados a las interfaces o servicios existentes
+        // los mocks adaptados a lo servicios existentes
         private readonly Mock<IRestaurantRepository> _mockRestaurantRepo;
 
         public MenuAndScheduleTests()
@@ -22,16 +22,16 @@ namespace SGRR.Test
         [Fact]
         public async Task GetAvailableMenuItems_ReturnsListWithFullDetails()
         {
-            // Arrange - Usando el constructor y tipos correctos que exige MenuItem (Guid y parámetros por constructor)
+            // Arrange 
             var restaurantId = Guid.NewGuid();
             var mockDishes = new List<MenuItem>
             {
-                // Ajusta los parámetros según el orden del constructor de MenuItem que marca el error
+                
                 new MenuItem("Plato Ejecutivo", "Arroz, carne y ensalada", 350.00m, "categoria-id", restaurantId, "imagen.jpg")
                 
             };
 
-            // Act & Assert básico para validar la estructura del menú
+            
             Assert.NotNull(mockDishes);
             var dish = mockDishes.First();
             Assert.Equal("Plato Ejecutivo", dish.Name);
@@ -41,7 +41,7 @@ namespace SGRR.Test
         [Fact]
         public async Task GetRestaurantSchedules_ReturnsConfiguredSchedules()
         {
-            // Arrange - Usando el constructor que exige RestaurantSchedule (Guid, DayOfWeek, TimeSpan, TimeSpan)
+            // Arrange 
             var restaurantId = Guid.NewGuid();
             var mockSchedules = new List<RestaurantSchedule>
             {

@@ -25,7 +25,7 @@ namespace SGRR.Test
             _mockMenuRepo = new Mock<IMenuRepository>();
             _mockUserRepo = new Mock<IUserRepository>();
 
-            // Ajusta los parámetros 
+            // los parámetros 
             _controller = new OrdenesAnticipadasController(
                 _mockOrdenService.Object,
                 _mockRestaurantRepo.Object,
